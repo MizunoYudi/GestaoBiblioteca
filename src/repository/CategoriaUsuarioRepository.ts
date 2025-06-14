@@ -1,6 +1,5 @@
 import { CategoriaUsuario } from "../model/CategoriaUsuario";
 
-
 export class CategoriaUsuarioRepository {
     private static instance: CategoriaUsuarioRepository;
     private categoriaUsuarioList: CategoriaUsuario[] =
