@@ -3,7 +3,7 @@ import { CategoriaLivroRepository } from "../repository/CategoriaLivroRepository
 export class CategoriaLivroService {
     categoriaRepository = CategoriaLivroRepository.getInstance();
 
-    listarCategoriaLivro(){
+    listarCategoriaLivro() {
         return this.categoriaRepository.buscarCategorias();
     }
 }
