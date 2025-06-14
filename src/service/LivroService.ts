@@ -26,6 +26,11 @@ export class LivroService {
         }
     }
 
+    listarLivros() {
+        const livros = this.livroRepository.buscarLivros();
+        return livros;
+    }
+
     filtrarPorISBN(isbn: string): Livro {
         const livro = this.livroRepository.buscarLivroIsbn(isbn);
         return livro;
