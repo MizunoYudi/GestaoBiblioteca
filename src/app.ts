@@ -1,9 +1,11 @@
 import express from "express";
-import { exibirCategoriaLivro } from "./controller/CategoriaLivroController";
+import { CategoriaLivroController } from "./controller/CategoriaLivroController";
 const app = express();
 const PORT = process.env.PORT ?? 3090 
 app.use(express.json());
 
-app.get('/library/categorias-livro', exibirCategoriaLivro);
+const categoriaLivroController = new CategoriaLivroController();
+
+app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 
 app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));

@@ -8,5 +8,6 @@ const CategoriaLivroController_1 = require("./controller/CategoriaLivroControlle
 const app = (0, express_1.default)();
 const PORT = process.env.PORT ?? 3090;
 app.use(express_1.default.json());
-app.get('/library/categorias-livro', CategoriaLivroController_1.exibirCategoriaLivro);
+const categoriaLivroController = new CategoriaLivroController_1.CategoriaLivroController();
+app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));
