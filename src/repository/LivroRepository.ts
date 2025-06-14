@@ -42,8 +42,8 @@ export class LivroRepository {
         return livro;
     }
 
-    excluirLivro(livro: Livro) {
-        const indice = this.livroList.indexOf(livro);
+    excluirLivro(isbn: string) {
+        const indice = this.livroList.findIndex(l => l.isbn == isbn);
         this.livroList.splice(indice);
     }
 
