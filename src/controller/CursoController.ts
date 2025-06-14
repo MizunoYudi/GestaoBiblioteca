@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { CursoService } from "../service/CursoService";
 
+const cursoService = new CursoService();
+
 export class CursoController {
-    private cursoService = new CursoService();
 
     exibirCursos(req: Request, res: Response) {
         try {
-            const cursos = this.cursoService.listarCursos();
+            const cursos = cursoService.listarCursos();
             res.status(200).json({
                 cursos
             });
