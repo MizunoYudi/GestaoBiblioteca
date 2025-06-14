@@ -4,7 +4,6 @@ import { CursoService } from "../service/CursoService";
 const cursoService = new CursoService();
 
 export class CursoController {
-
     exibirCursos(req: Request, res: Response) {
         try {
             const cursos = cursoService.listarCursos();
