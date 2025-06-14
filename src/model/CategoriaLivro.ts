@@ -1,4 +1,4 @@
-export class CategoriaUsuario {
+export class CategoriaLivro {
     id: number;
     nome: string;
 
