@@ -2,6 +2,7 @@ import express from "express";
 import { CategoriaLivroController } from "./controller/CategoriaLivroController";
 import { CategoriaUsuarioController } from "./controller/CategoriaUsuarioController";
 import { CursoController } from "./controller/CursoController";
+import { LivroController } from "./controller/LivroController";
 const app = express();
 const PORT = process.env.PORT ?? 3090 
 app.use(express.json());
@@ -9,9 +10,16 @@ app.use(express.json());
 const categoriaLivroController = new CategoriaLivroController();
 const categoriaUsuarioController = new CategoriaUsuarioController();
 const cursoController = new CursoController();
+const livroController = new LivroController();
 
 app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 app.get('/library/categorias-usuario', categoriaUsuarioController.exibirCategoriaUsuario);
 app.get('/library/cursos', cursoController.exibirCursos);
+
+app.post('/library/livros', livroController.novoLivro);
+app.get('/library/livros', livroController.exibirLivros);
+app.get('/library/livros/:isbn', livroController.filtrarLivroPorIsbn);
+app.put('/library/livros/:isbn', livroController.atualizarLivro);
+app.delete('/library/livros/:isbn', livroController.apagarLivro);
 
 app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));
