@@ -13,8 +13,8 @@ export class LivroRepository {
         return this.instance
     }
 
-    inserirLivro(livroData: any) {
-        this.livroList.push(livroData);
+    inserirLivro(livro: Livro) {
+        this.livroList.push(livro);
     }
 
     buscarLivros() {
