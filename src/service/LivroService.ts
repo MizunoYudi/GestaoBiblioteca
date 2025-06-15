@@ -5,14 +5,15 @@ export class LivroService {
     livroRepository = LivroRepository.getInstance();
 
     cadastrarLivro(livroData: any) {
-        const { id, titulo, autor, editora, edicao, isbn, categoria } = livroData;
-        if (!id || !titulo || !isbn || !autor || !editora || !edicao || !categoria) {
+        const { id, titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
+        if (!id || !titulo || !autor || !editora || !edicao || !isbn || !categoria_id) {
             throw new Error("Informações incompletas para o cadastro do livro");
         }
 
-        const novoLivro = new Livro(parseInt(id), titulo, autor, editora, edicao, isbn, parseInt(categoria));
+        const novoLivro = new Livro(parseInt(id), titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
         if (!this.verificarSemelhantes(novoLivro.autor, novoLivro.editora, novoLivro.edicao)) {
             this.livroRepository.inserirLivro(novoLivro);
+            return novoLivro;
         }
     }
 
