@@ -6,7 +6,7 @@ export class LivroService {
 
     cadastrarLivro(livroData: any) {
         const { id, titulo, autor, editora, edicao, isbn, categoria } = livroData;
-        if (!titulo || !isbn || !autor || !editora || !edicao || !categoria) {
+        if (!id || !titulo || !isbn || !autor || !editora || !edicao || !categoria) {
             throw new Error("Informações incompletas para o cadastro do livro");
         }
 
