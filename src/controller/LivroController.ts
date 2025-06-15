@@ -16,7 +16,7 @@ export class LivroController {
         }
     }
 
-    exibirLivros(res: Response) {
+    exibirLivros(req: Request, res: Response) {
         try {
             const livros = livroService.listarLivros();
             res.status(200).json({
