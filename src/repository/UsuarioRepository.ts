@@ -4,6 +4,13 @@ export class UsuarioRepository {
     private static instance: UsuarioRepository;
     private usuarioList: Usuario[] = [];
 
+    public static getInstance(): UsuarioRepository {
+        if (!this.instance) {
+            this.instance = new UsuarioRepository();
+        }
+        return this.instance
+    }
+
     inserirUsuario(usuario: Usuario) {
         const cpf = this.usuarioList.map(u => u.cpf).indexOf(usuario.cpf);
         const id = this.usuarioList.map(u => u.id).indexOf(usuario.id);
