@@ -38,7 +38,6 @@ export class LivroService {
     }
 
     atualizarLivro(livroData: any, isbn: string) {
-        const livro = this.livroRepository.buscarLivroIsbn(isbn);
         const { titulo, autor, editora, edicao, categoria } = livroData;
         if (!this.verificarSemelhantes(autor, editora, edicao)) {
             const livroAtualizado = this.livroRepository.alterarLivro(titulo, autor, editora, edicao, categoria, isbn);
