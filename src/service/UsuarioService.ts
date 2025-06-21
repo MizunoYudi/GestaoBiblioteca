@@ -29,7 +29,7 @@ export class UsuarioService {
                 const dig_10 = this.validarDigito(10, cpfNum);
                 const dig_11 = this.validarDigito(11, cpfNum);
 
-                if(dig_10 == cpfNum[10] && dig_11 == cpfNum[11]){
+                if(dig_10 == cpfNum[9] && dig_11 == cpfNum[10]){
                     return true;
                 } else {
                     throw new Error("CPF inválido: digitos de verificacao invalidos");
