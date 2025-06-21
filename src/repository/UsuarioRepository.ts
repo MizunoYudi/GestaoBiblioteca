@@ -17,7 +17,7 @@ export class UsuarioRepository {
         if(cpf == -1 && id == -1){
             this.usuarioList.push(usuario);
         } else {
-            throw("Já existe um usuário com o mesmo cpf ou id no sistema");
+            throw new Error("Já existe um usuário com o mesmo cpf ou id no sistema");
         }
     }
 
