@@ -11,7 +11,7 @@ export class EstoqueService {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
 
-        const novoExemplar = new Estoque(id, livro_id, quantidade, quantidade_emprestada, true);
+        const novoExemplar = new Estoque(parseInt(id), parseInt(livro_id), parseInt(quantidade), parseInt(quantidade_emprestada), true);
         this.estoqueRepository.inserirExemplar(novoExemplar);
     }
 
