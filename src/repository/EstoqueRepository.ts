@@ -35,13 +35,9 @@ export class EstoqueRepository {
         }
     }
 
-    alterarExemplar(qtd: number, qtd_emp: number, disponivel: boolean, id: number) {
+    alterarExemplar(disponivel: boolean, id: number) {
         const exmp = this.filtrarPorId(id);
-
-        qtd ? exmp.quantidade = qtd : exmp.quantidade = exmp.quantidade;
-        qtd_emp ? exmp.quantidade_emprestada = qtd_emp : exmp.quantidade_emprestada = exmp.quantidade_emprestada;
-        typeof disponivel != 'undefined' ? exmp.disponivel = disponivel : exmp.disponivel = exmp.disponivel;
-
+        exmp.disponivel = disponivel
         return exmp;
     }
 
