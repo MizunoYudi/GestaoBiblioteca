@@ -13,6 +13,7 @@ export class EstoqueService {
 
         const novoExemplar = new Estoque(parseInt(id), parseInt(livro_id), parseInt(quantidade), parseInt(quantidade_emprestada), true);
         this.estoqueRepository.inserirExemplar(novoExemplar);
+        return novoExemplar;
     }
 
     listarExemplares() {
