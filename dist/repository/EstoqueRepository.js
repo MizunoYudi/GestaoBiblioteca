@@ -1,0 +1,50 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EstoqueRepository = void 0;
+class EstoqueRepository {
+    static instance;
+    estoqueList = [];
+    constructor() { }
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new EstoqueRepository();
+        }
+        return this.instance;
+    }
+    inserirExemplar(exemplar) {
+        const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
+        if (id == -1) {
+            this.estoqueList.push(exemplar);
+        }
+        else {
+            throw new Error("Já existe um exemplar com o mesmo id");
+        }
+    }
+    buscarExemplares() {
+        return this.estoqueList;
+    }
+    filtrarPorId(id) {
+        const indice = this.estoqueList.findIndex(e => e.id == id);
+        if (indice == -1) {
+            throw new Error("Exemplar não encontrado");
+        }
+        else {
+            return this.estoqueList[indice];
+        }
+    }
+    alterarExemplar(disponivel, id) {
+        const exmp = this.filtrarPorId(id);
+        if (disponivel) {
+            exmp.disponivel = true;
+        }
+        else {
+            exmp.disponivel = false;
+        }
+        return exmp;
+    }
+    excluirExemplar(id) {
+        const indice = this.estoqueList.findIndex(e => e.id == id);
+        this.estoqueList.splice(indice);
+    }
+}
+exports.EstoqueRepository = EstoqueRepository;

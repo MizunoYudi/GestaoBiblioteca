@@ -9,6 +9,7 @@ const CategoriaUsuarioController_1 = require("./controller/CategoriaUsuarioContr
 const CursoController_1 = require("./controller/CursoController");
 const LivroController_1 = require("./controller/LivroController");
 const UsuarioController_1 = require("./controller/UsuarioController");
+const EstoqueController_1 = require("./controller/EstoqueController");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT ?? 3090;
 app.use(express_1.default.json());
@@ -17,6 +18,7 @@ const categoriaUsuarioController = new CategoriaUsuarioController_1.CategoriaUsu
 const cursoController = new CursoController_1.CursoController();
 const livroController = new LivroController_1.LivroController();
 const usuarioController = new UsuarioController_1.UsuarioController();
+const estoqueController = new EstoqueController_1.EstoqueController();
 app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 app.get('/library/categorias-usuario', categoriaUsuarioController.exibirCategoriaUsuario);
 app.get('/library/cursos', cursoController.exibirCursos);
@@ -30,4 +32,9 @@ app.get('/library/usuarios', usuarioController.exibirUsuarios);
 app.get('/library/usuarios/:cpf', usuarioController.filtrarUsuarioPorCPF);
 app.put('/library/usuarios/:cpf', usuarioController.atualizarUsuario);
 app.delete('/library/usuarios/:cpf', usuarioController.apagarUsuario);
+app.post('/library/estoque', estoqueController.novoExemplar);
+app.get('/library/estoque', estoqueController.exibirExemplares);
+app.get('/library/estoque/:id', estoqueController.filtrarExemplarPorId);
+app.put('/library/estoque/:id', estoqueController.atualizarDiponibilidade);
+app.delete('/library/estoque/:id', estoqueController.apagarExemplar);
 app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));
