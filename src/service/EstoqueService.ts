@@ -17,7 +17,7 @@ export class EstoqueService {
 
     listarExemplares() {
         const exemplares = this.estoqueRepository.buscarExemplares();
-        return exemplares;
+        return exemplares.filter(e => e.disponivel == true);
     }
 
     filtrarPorId(id: number): Estoque {
