@@ -6,6 +6,13 @@ export class EstoqueRepository {
 
     private constructor() { }
 
+    public static getInstance(): EstoqueRepository {
+        if (!this.instance) {
+            this.instance = new EstoqueRepository();
+        }
+        return this.instance
+    }
+
     inserirExemplar(exemplar: Estoque) {
         const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
         if(id == -1){
