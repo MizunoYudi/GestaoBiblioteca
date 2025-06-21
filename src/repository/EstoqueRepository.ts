@@ -37,12 +37,16 @@ export class EstoqueRepository {
 
     alterarExemplar(disponivel: boolean, id: number) {
         const exmp = this.filtrarPorId(id);
-        exmp.disponivel = disponivel
+        if(disponivel){
+            exmp.disponivel = true
+        } else {
+            exmp.disponivel = false
+        }
         return exmp;
     }
 
     excluirExemplar(id: number){
-        const indice = this.estoqueList.findIndex(e => e.id == e.id);
+        const indice = this.estoqueList.findIndex(e => e.id == id);
         this.estoqueList.splice(indice);
     }
 }
