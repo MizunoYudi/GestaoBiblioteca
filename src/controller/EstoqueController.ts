@@ -44,7 +44,7 @@ export class EstoqueController {
         try{
             const id = parseInt(req.params.id);
             const exemplar = estoqueService.atualizarDisponibilidade(req.body.disponivel, id);
-            if(!req.body.disponivel){
+            if(typeof req.body.disponivel == 'undefined'){
                 res.status(401).json({
                     Status: "Error", 
                     mensagem: "Insira a disponibilidade para poder altera-la"
