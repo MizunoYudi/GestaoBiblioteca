@@ -34,13 +34,15 @@ export class UsuarioRepository {
         }
     }
 
-    alterarUsuario(nome: string, ativo: string, categoria_id: number, curso_id: number, cpf: string){
+    alterarUsuario(nome: string, ativo: string, categoria_id: number, curso_id: number, cpf: string): Usuario{
         const usuario = this.buscarUsuarioCPF(cpf);
 
         nome ? usuario.nome = nome : usuario.nome = usuario.nome;
         ativo ? usuario.ativo = ativo : usuario.ativo = usuario.ativo;
         categoria_id ? usuario.categoria_id = categoria_id : usuario.categoria_id = usuario.categoria_id;
         curso_id ? usuario.curso_id = curso_id : usuario.curso_id = usuario.curso_id;
+        
+        return usuario;
     }
 
     excluirUsuario(cpf: string){

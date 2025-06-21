@@ -62,9 +62,9 @@ export class UsuarioService {
         return usuario;
     }
 
-    atualizarUsuario(usuarioData: any, cpf: string) {
+    atualizarUsuario(usuarioData: any, cpf: string): Usuario {
         const { nome, ativo, categoria_id, curso_id } = usuarioData;
-        this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
+        return this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
     }
 
     removerUsuario(cpf: string) {
