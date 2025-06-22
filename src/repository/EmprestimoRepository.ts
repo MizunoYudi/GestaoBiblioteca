@@ -26,15 +26,19 @@ export class EmprestimoRepository {
         return this.emprestimoList;
     }
 
-    registrarDevolucao(entrega: Date, atraso: number, suspensao: Date, id: number){
+    buscarEmprestimoId(id: number){
         const indice = this.emprestimoList.findIndex(e => e.id == id);
         if(indice == -1){
             throw new Error("Emprestimo não encontrado");
-        } else {
-            const emp = this.emprestimoList[indice];
-            emp.data_entrega = entrega;
-            emp.dias_atraso = atraso;
-            emp.suspensao_ate = suspensao;
         }
+        return this.emprestimoList[indice];
+    }
+
+    registrarDevolucao(entrega: Date, atraso: number, suspensao: Date, id: number){
+        const emp = this.buscarEmprestimoId(id);
+        
+        emp.data_entrega = entrega;
+        emp.dias_atraso = atraso;
+        emp.suspensao_ate = suspensao;
     }
 }
