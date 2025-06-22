@@ -34,4 +34,13 @@ export class CategoriaLivroRepository {
     buscarCategorias() {
         return this.categoriaLivroList;
     }
+
+    verificarCategoria(id: number): boolean{
+        const indice = this.categoriaLivroList.findIndex(c => c.id == id);
+        if(indice == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

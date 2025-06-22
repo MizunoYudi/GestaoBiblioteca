@@ -1,8 +1,10 @@
 import { Livro } from "../model/Livro";
+import { CategoriaLivroRepository } from "../repository/CategoriaLivroRepository";
 import { LivroRepository } from "../repository/LivroRepository";
 
 export class LivroService {
     livroRepository = LivroRepository.getInstance();
+    categoriaLivroRepository = CategoriaLivroRepository.getInstance();
 
     cadastrarLivro(livroData: any) {
         const { id, titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
@@ -11,9 +13,21 @@ export class LivroService {
         }
 
         const novoLivro = new Livro(parseInt(id), titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
-        if (!this.verificarSemelhantes(novoLivro.autor, novoLivro.editora, novoLivro.edicao)) {
+        if (this.validarLivro(novoLivro)) {
             this.livroRepository.inserirLivro(novoLivro);
             return novoLivro;
+        }
+    }
+
+    validarLivro(livro: Livro): boolean{
+        if(this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)){
+            if(!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)){
+                return true;
+            } else {
+                throw new Error("Já existe um livro com a mesma combinação de autor, editora e edição no sistema");
+            }
+        } else {
+            throw new Error("Categoria inválida");
         }
     }
 
@@ -23,13 +37,13 @@ export class LivroService {
         if (semelhante == -1) {
             return false;
         } else {
-            throw new Error("Já existe um livro com a mesma combinação de autor, editora e edição no sistema");
+            return true;
         }
     }
 
     listarLivros() {
         const livros = this.livroRepository.buscarLivros();
-        return livros;
+        return livros;      
     }
 
     filtrarPorISBN(isbn: string): Livro {
