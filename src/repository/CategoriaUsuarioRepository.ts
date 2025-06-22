@@ -30,4 +30,13 @@ export class CategoriaUsuarioRepository {
     buscarCategorias() {
         return this.categoriaUsuarioList;
     }
+
+    verificarCategoria(id: number): boolean{
+        const indice = this.categoriaUsuarioList.findIndex(c => c.id == id);
+        if(indice == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

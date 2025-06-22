@@ -1,8 +1,12 @@
 import { Usuario } from "../model/Usuario";
+import { CategoriaUsuarioRepository } from "../repository/CategoriaUsuarioRepository";
+import { CursoRepository } from "../repository/CursoRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 
 export class UsuarioService {
     usuarioRepository = UsuarioRepository.getInstance();
+    categoriaUsuarioRepository = CategoriaUsuarioRepository.getInstance();
+    cursoRepository = CursoRepository.getInstance();
 
     cadastrarUsuario(usuarioData: any) {
         const { id, nome, cpf, ativo, categoria_id, curso_id } = usuarioData;
@@ -11,9 +15,23 @@ export class UsuarioService {
         }
 
         const novoUsuario = new Usuario(parseInt(id), nome, cpf, ativo, parseInt(categoria_id), parseInt(curso_id));
-        if(this.validarCPF(novoUsuario.cpf)){
+        if(this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)){
             this.usuarioRepository.inserirUsuario(novoUsuario);
             return novoUsuario;
+        }
+    }
+
+    validarUsuario(usuario: Usuario): boolean{
+        const curso = this.cursoRepository.verificarCurso(usuario.curso_id);
+        const categoria = this.categoriaUsuarioRepository.verificarCategoria(usuario.categoria_id);
+        if(categoria){
+            if(curso){
+                return true;
+            } else {
+                throw new Error("Curso inválido");
+            }
+        } else {
+            throw new Error("Categoria inválida");
         }
     }
 

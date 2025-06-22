@@ -30,4 +30,13 @@ export class CursoRepository {
     buscarCursos() {
         return this.cursoList;
     }
+
+    verificarCurso(id: number): boolean{
+        const indice = this.cursoList.findIndex(c => c.id == id);
+        if(indice == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
