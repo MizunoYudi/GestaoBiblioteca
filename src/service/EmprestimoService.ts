@@ -1,4 +1,5 @@
 import { Emprestimo } from "../model/Emprestimo";
+import { Usuario } from "../model/Usuario";
 import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
@@ -17,9 +18,8 @@ export class EmprestimoService {
             throw new Error("Informações incompletas para o cadastro do emprestimo");
         }
 
-        const usuario = this.usuarioRepository.buscarUsuarioId(usuario_id.id);
-        const devolucao = this.calcularDevolucao(usuario.categoria_id, estoque_id);
-
+        const usuario = this.usuarioRepository.buscarUsuarioId(parseInt(usuario_id));
+        const devolucao = this.calcularDevolucao(usuario, estoque_id, new Date(data_emprestimo));
         const novoEmprestimo = new Emprestimo(parseInt(id), parseInt(usuario_id), parseInt(estoque_id), data_emprestimo, devolucao, new Date(), 0, new Date());
         this.emprestimoRepository.inserirEmprestimo(novoEmprestimo);
         return novoEmprestimo;
@@ -38,10 +38,11 @@ export class EmprestimoService {
         this.emprestimoRepository.registrarDevolucao(data, atraso.dias, atraso.data, id);
     }
 
-    calcularDevolucao(categoria_usuario: number, estoque_id: number): Date{
-        const data_devolucao = new Date();
-        const permissoes = this.permissoesEmprestimo(categoria_usuario, estoque_id);
-        data_devolucao.setDate(data_devolucao.getDate() + permissoes.dias);
+    calcularDevolucao(usuario: Usuario, estoque_id: number, data_emprestimo: Date): Date{
+        const data_devolucao = new Date(data_emprestimo);
+        const permissoes = this.permissoesEmprestimo(usuario, estoque_id);
+        data_devolucao.setDate(data_emprestimo.getDate() + permissoes.dias);
+        console.log(data_devolucao);
         return data_devolucao;
     }
 
@@ -54,7 +55,7 @@ export class EmprestimoService {
 
     diasAtrasoPorCategoria(emp: Emprestimo) {
         const usuario = this.usuarioRepository.buscarUsuarioId(emp.usuario_id);
-        const permissoes = this.permissoesEmprestimo(usuario.categoria_id, emp.estoque_id);
+        const permissoes = this.permissoesEmprestimo(usuario, emp.estoque_id);
         const data_atual = new Date();
         const dias_atraso = (data_atual.getDate() - emp.data_emprestimo.getDate()) / 1000 * 60 * 60 * 24;
         if(dias_atraso - permissoes.dias > 0){
@@ -63,34 +64,34 @@ export class EmprestimoService {
         return 0;
     }
 
-    permissoesEmprestimo(categoria_usuario: number, estoque_id: number) {
+    permissoesEmprestimo(usuario: Usuario, estoque_id: number) {
         const estoque = this.estoqueRepository.buscarPorId(estoque_id);
         const livro = this.livroRepository.buscarLivroId(estoque.livro_id);
         const disponibilidade_emp = { dias: 0, livros: 0 };
 
-        switch (categoria_usuario) {
+        switch (usuario.categoria_id) {
             case 1:
                 disponibilidade_emp.livros = 5;
                 disponibilidade_emp.dias = 40;
                 break;
             case 2:
                 disponibilidade_emp.livros = 3;
-                if (this.relacaoCategoriaCursoLivro(categoria_usuario, livro.categoria_id)) {
+                if (this.relacaoCategoriaCursoLivro(usuario.curso_id, livro.categoria_id)) {
                     disponibilidade_emp.dias = 30;
                 } else {
                     disponibilidade_emp.dias = 15;
                 }
                 break;
             default:
-                // COLOCAR DFEPOIS
+                
         }
         return disponibilidade_emp;
     }
 
-    relacaoCategoriaCursoLivro(categoria_usuario: number, categoria_livro: number): boolean {
+    relacaoCategoriaCursoLivro(curso: number, categoria_livro: number): boolean {
         let relacao: boolean = false;
 
-        switch (categoria_usuario) {
+        switch (curso) {
             case 1:
                 if (categoria_livro == 2) {
                     relacao = true
