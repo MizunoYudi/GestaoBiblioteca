@@ -36,7 +36,7 @@ export class EstoqueRepository {
     }
 
     alterarExemplar(disponivel: boolean, id: number) {
-        const exmp = this.filtrarPorId(id);
+        const exmp = this.buscarPorId(id);
         if(disponivel){
             exmp.disponivel = true
         } else {
