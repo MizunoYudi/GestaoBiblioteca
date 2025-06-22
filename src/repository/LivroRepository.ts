@@ -37,6 +37,15 @@ export class LivroRepository {
         }
     }
 
+    buscarLivroId(id: number): Livro {
+        const indice = this.livroList.findIndex(l => l.id == id);
+        if (indice == -1) {
+            throw new Error("Livro não encontrado");
+        } else {
+            return this.livroList[indice];
+        }
+    }
+
     alterarLivro(titulo: string, autor: string, editora: string, edicao: string, categoria_id: number, isbn: string): Livro {
         const livro = this.buscarLivroIsbn(isbn);
 
