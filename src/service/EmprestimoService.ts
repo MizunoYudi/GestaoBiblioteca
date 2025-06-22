@@ -22,6 +22,7 @@ export class EmprestimoService {
 
         const novoEmprestimo = new Emprestimo(parseInt(id), parseInt(usuario_id), parseInt(estoque_id), data_emprestimo, devolucao, new Date(), 0, new Date());
         this.emprestimoRepository.inserirEmprestimo(novoEmprestimo);
+        return novoEmprestimo;
     }
 
     listarEmprestimos() {
