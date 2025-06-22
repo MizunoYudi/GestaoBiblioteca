@@ -26,7 +26,7 @@ export class EstoqueRepository {
         return this.estoqueList;
     }
 
-    filtrarPorId(id: number){
+    buscarPorId(id: number){
         const indice = this.estoqueList.findIndex(e => e.id == id);
         if (indice == -1) {
             throw new Error("Exemplar não encontrado");

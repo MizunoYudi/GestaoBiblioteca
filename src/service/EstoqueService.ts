@@ -22,7 +22,7 @@ export class EstoqueService {
     }
 
     filtrarPorId(id: number): Estoque {
-        const exemplar = this.estoqueRepository.filtrarPorId(id);
+        const exemplar = this.estoqueRepository.buscarPorId(id);
         return exemplar;
     }
 
