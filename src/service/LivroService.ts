@@ -19,7 +19,7 @@ export class LivroService {
 
     verificarSemelhantes(autor: string, editora: string, edicao: string): boolean {
         const livros = this.livroRepository.buscarLivros();
-        const semelhante = livros.findIndex(l => l.autor == autor && l.editora == editora && l.editora == editora);
+        const semelhante = livros.findIndex(l => l.autor == autor && l.editora == editora && l.edicao == edicao);
         if (semelhante == -1) {
             return false;
         } else {
