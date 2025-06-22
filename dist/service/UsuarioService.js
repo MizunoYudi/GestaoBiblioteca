@@ -25,26 +25,25 @@ class UsuarioService {
             if (cpfNum.every(n => n == cpfNum[0])) {
                 throw new Error("CPF inválido: é uma sequência de números repetidos");
             }
+            const dig_10 = this.validarDigito(10, cpfNum);
+            const copiaCPF = cpfNum;
+            copiaCPF.push(dig_10);
+            const dig_11 = this.validarDigito(11, copiaCPF);
+            if (dig_10 == cpfNum[9] && dig_11 == cpfNum[10]) {
+                return true;
+            }
             else {
-                const dig_10 = this.validarDigito(10, cpfNum);
-                const dig_11 = this.validarDigito(11, cpfNum);
-                if (dig_10 == cpfNum[9] && dig_11 == cpfNum[10]) {
-                    return true;
-                }
-                else {
-                    throw new Error("CPF inválido: digitos de verificacao invalidos");
-                }
+                throw new Error("CPF inválido: digitos de verificacao invalidos");
             }
         }
-        return false;
     }
     validarDigito(digito, cpfNum) {
         let soma = 0;
         for (let i = 0; i < digito - 1; i++) {
             soma += cpfNum[i] * (digito - i);
         }
-        const divisao = (soma * 100) % 11;
-        if (divisao < 2 || divisao == 10) {
+        const divisao = soma % 11;
+        if (divisao < 2) {
             return 0;
         }
         else {

@@ -23,7 +23,7 @@ class EstoqueRepository {
     buscarExemplares() {
         return this.estoqueList;
     }
-    filtrarPorId(id) {
+    buscarPorId(id) {
         const indice = this.estoqueList.findIndex(e => e.id == id);
         if (indice == -1) {
             throw new Error("Exemplar não encontrado");
@@ -33,7 +33,7 @@ class EstoqueRepository {
         }
     }
     alterarExemplar(disponivel, id) {
-        const exmp = this.filtrarPorId(id);
+        const exmp = this.buscarPorId(id);
         if (disponivel) {
             exmp.disponivel = true;
         }

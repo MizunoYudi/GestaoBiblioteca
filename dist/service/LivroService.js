@@ -18,7 +18,7 @@ class LivroService {
     }
     verificarSemelhantes(autor, editora, edicao) {
         const livros = this.livroRepository.buscarLivros();
-        const semelhante = livros.findIndex(l => l.autor == autor && l.editora == editora && l.editora == editora);
+        const semelhante = livros.findIndex(l => l.autor == autor && l.editora == editora && l.edicao == edicao);
         if (semelhante == -1) {
             return false;
         }

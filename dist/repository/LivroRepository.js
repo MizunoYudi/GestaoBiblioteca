@@ -35,6 +35,15 @@ class LivroRepository {
             return this.livroList[indice];
         }
     }
+    buscarLivroId(id) {
+        const indice = this.livroList.findIndex(l => l.id == id);
+        if (indice == -1) {
+            throw new Error("Livro não encontrado");
+        }
+        else {
+            return this.livroList[indice];
+        }
+    }
     alterarLivro(titulo, autor, editora, edicao, categoria_id, isbn) {
         const livro = this.buscarLivroIsbn(isbn);
         titulo ? livro.titulo = titulo : livro.titulo = livro.titulo;

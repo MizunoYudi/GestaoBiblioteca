@@ -28,11 +28,9 @@ export class UsuarioService {
             }
 
             const dig_10 = this.validarDigito(10, cpfNum);
-            console.log(`Digito 10: ${dig_10}`);
             const copiaCPF = cpfNum;
             copiaCPF.push(dig_10);
             const dig_11 = this.validarDigito(11, copiaCPF);
-            console.log(`Digito 11: ${dig_11}`);
 
             if(dig_10 == cpfNum[9] && dig_11 == cpfNum[10]){
                 return true;
@@ -40,7 +38,6 @@ export class UsuarioService {
                 throw new Error("CPF inválido: digitos de verificacao invalidos");
             }
         }
-        return false;
     }
 
     validarDigito(digito: number, cpfNum: number[]): number {

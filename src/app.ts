@@ -5,6 +5,7 @@ import { CursoController } from "./controller/CursoController";
 import { LivroController } from "./controller/LivroController";
 import { UsuarioController } from "./controller/UsuarioController";
 import { EstoqueController } from "./controller/EstoqueController";
+import { EmprestimoController } from "./controller/EmprestimoController";
 const app = express();
 const PORT = process.env.PORT ?? 3090 
 app.use(express.json());
@@ -15,6 +16,7 @@ const cursoController = new CursoController();
 const livroController = new LivroController();
 const usuarioController = new UsuarioController();
 const estoqueController = new EstoqueController();
+const emprestimoController = new EmprestimoController();
 
 app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 app.get('/library/categorias-usuario', categoriaUsuarioController.exibirCategoriaUsuario);
@@ -37,6 +39,10 @@ app.get('/library/estoque', estoqueController.exibirExemplares);
 app.get('/library/estoque/:id', estoqueController.filtrarExemplarPorId);
 app.put('/library/estoque/:id', estoqueController.atualizarDiponibilidade);
 app.delete('/library/estoque/:id', estoqueController.apagarExemplar);
+
+app.post('/library/emprestimos', emprestimoController.novoEmprestimo);
+app.get('/library/emprestimos', emprestimoController.exibirEmprestimos);
+app.put('/library/emprestimos/:id', emprestimoController.atualizarEmprestimo);
 
 
 app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));

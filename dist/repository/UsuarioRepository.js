@@ -32,6 +32,15 @@ class UsuarioRepository {
             return this.usuarioList[indice];
         }
     }
+    buscarUsuarioId(id) {
+        const indice = this.usuarioList.findIndex(u => u.id == id);
+        if (indice == -1) {
+            throw new Error("Usuário não encontrado");
+        }
+        else {
+            return this.usuarioList[indice];
+        }
+    }
     alterarUsuario(nome, ativo, categoria_id, curso_id, cpf) {
         const usuario = this.buscarUsuarioCPF(cpf);
         nome ? usuario.nome = nome : usuario.nome = usuario.nome;
