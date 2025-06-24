@@ -12,7 +12,7 @@ class EmprestimoService {
     livroRepository = LivroRepository_1.LivroRepository.getInstance();
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
     cadastrarEmprestimo(empData) {
-        const { id, usuario_id, estoque_id, data_emprestimo, data_devolucao } = empData;
+        const { id, usuario_id, estoque_id, data_emprestimo } = empData;
         if (!id || !usuario_id || !estoque_id || !data_emprestimo) {
             throw new Error("Informações incompletas para o cadastro do emprestimo");
         }
@@ -107,8 +107,12 @@ class EmprestimoService {
     calcularAtraso(emp) {
         const atraso = { dias: 0, data: new Date(), dias_suspensao: 0 };
         const data = new Date(emp.data_emprestimo);
+        const permissoes = this.permissoesEmprestimo(emp.usuario_id, emp.estoque_id);
         atraso.dias_suspensao = this.diasAtrasoPorCategoria(emp);
         atraso.dias = Math.floor((atraso.data.getTime() - data.getTime()) / (1000 * 60 * 60 * 24));
+        if (atraso.dias <= permissoes.dias) {
+            atraso.dias = 0;
+        }
         atraso.data.setDate(atraso.data.getDate() + atraso.dias_suspensao);
         return atraso;
     }
