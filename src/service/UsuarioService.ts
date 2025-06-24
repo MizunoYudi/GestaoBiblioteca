@@ -1,12 +1,14 @@
 import { Usuario } from "../model/Usuario";
 import { CategoriaUsuarioRepository } from "../repository/CategoriaUsuarioRepository";
 import { CursoRepository } from "../repository/CursoRepository";
+import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 
 export class UsuarioService {
     usuarioRepository = UsuarioRepository.getInstance();
     categoriaUsuarioRepository = CategoriaUsuarioRepository.getInstance();
     cursoRepository = CursoRepository.getInstance();
+    emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarUsuario(usuarioData: any) {
         const { id, nome, cpf, ativo, categoria_id, curso_id } = usuarioData;
@@ -15,17 +17,17 @@ export class UsuarioService {
         }
 
         const novoUsuario = new Usuario(parseInt(id), nome, cpf, ativo, parseInt(categoria_id), parseInt(curso_id));
-        if(this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)){
+        if (this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)) {
             this.usuarioRepository.inserirUsuario(novoUsuario);
             return novoUsuario;
         }
     }
 
-    validarUsuario(usuario: Usuario): boolean{
+    validarUsuario(usuario: Usuario): boolean {
         const curso = this.cursoRepository.verificarCurso(usuario.curso_id);
         const categoria = this.categoriaUsuarioRepository.verificarCategoria(usuario.categoria_id);
-        if(categoria){
-            if(curso){
+        if (categoria) {
+            if (curso) {
                 return true;
             } else {
                 throw new Error("Curso inválido");
@@ -50,7 +52,7 @@ export class UsuarioService {
             copiaCPF.push(dig_10);
             const dig_11 = this.validarDigito(11, copiaCPF);
 
-            if(dig_10 == cpfNum[9] && dig_11 == cpfNum[10]){
+            if (dig_10 == cpfNum[9] && dig_11 == cpfNum[10]) {
                 return true;
             } else {
                 throw new Error("CPF inválido: digitos de verificacao invalidos");
@@ -67,12 +69,24 @@ export class UsuarioService {
         if (divisao < 2) {
             return 0;
         } else {
-            return 11 - divisao; 
+            return 11 - divisao;
         }
     }
 
-    listarUsuarios() {
-        const usuarios = this.usuarioRepository.buscarUsuarios();
+    listarUsuarios(filtro?: number, valor?: any) {
+        let usuarios = this.usuarioRepository.buscarUsuarios();
+        if(filtro !== undefined && valor !== undefined){
+            switch(filtro){
+                case 1:
+                    const categoria = parseInt(valor);
+                    usuarios = usuarios.filter(u => u.categoria_id == categoria);
+                    break;
+                case 2:
+                    const curso = valor;
+                    usuarios = usuarios.filter(u => u.curso_id == curso);
+                    break;
+            }
+        }
         return usuarios;
     }
 
@@ -87,6 +101,19 @@ export class UsuarioService {
     }
 
     removerUsuario(cpf: string) {
-        this.usuarioRepository.excluirUsuario(cpf);
+        const usuario = this.filtrarPorCPF(cpf);
+        if (this.verificarEmprestimo(usuario.id)) {
+            throw new Error("Usuário possui emprestimos pendentes no sistema");
+        } else {
+            this.usuarioRepository.excluirUsuario(cpf);
+        }
+    }
+
+    verificarEmprestimo(usuario_id: number) {
+        if (this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

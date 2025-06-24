@@ -1,10 +1,12 @@
 import { Livro } from "../model/Livro";
 import { CategoriaLivroRepository } from "../repository/CategoriaLivroRepository";
+import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
 
 export class LivroService {
     livroRepository = LivroRepository.getInstance();
     categoriaLivroRepository = CategoriaLivroRepository.getInstance();
+    estoqueRepository = EstoqueRepository.getInstance();
 
     cadastrarLivro(livroData: any) {
         const { id, titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
@@ -19,9 +21,9 @@ export class LivroService {
         }
     }
 
-    validarLivro(livro: Livro): boolean{
-        if(this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)){
-            if(!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)){
+    validarLivro(livro: Livro): boolean {
+        if (this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)) {
+            if (!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)) {
                 return true;
             } else {
                 throw new Error("Já existe um livro com a mesma combinação de autor, editora e edição no sistema");
@@ -41,9 +43,29 @@ export class LivroService {
         }
     }
 
-    listarLivros() {
-        const livros = this.livroRepository.buscarLivros();
-        return livros;      
+    listarLivros(filtro?: number, valor?: any) {
+        let livros = this.livroRepository.buscarLivros();
+        if (filtro !== undefined && valor !== undefined) {
+            switch (filtro) {
+                case 1:
+                    const titulo = valor;
+                    livros = livros.filter(l => l.titulo === titulo);
+                    break;
+                case 2:
+                    const autor = valor;
+                    livros = livros.filter(l => l.autor === autor);
+                    break;
+                case 3:
+                    const editora = valor;
+                    livros = livros.filter(l => l.editora === editora);
+                    break;
+                case 4:
+                    const edicao = valor;
+                    livros = livros.filter(l => l.edicao === edicao);
+                    break;
+            }
+        }
+        return livros;
     }
 
     filtrarPorISBN(isbn: string): Livro {
@@ -60,6 +82,19 @@ export class LivroService {
     }
 
     removerLivro(isbn: string) {
-        this.livroRepository.excluirLivro(isbn);
+        const livro = this.filtrarPorISBN(isbn);
+        if (this.verificarEstoque(livro.id)) {
+            throw new Error("Possui um estoques relacionados");
+        } else {
+            this.livroRepository.excluirLivro(isbn);
+        }
+    }
+
+    verificarEstoque(livro_id: number) {
+        if (this.estoqueRepository.buscarEstoqueLivro(livro_id)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
