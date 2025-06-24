@@ -15,7 +15,7 @@ export class EstoqueRepository {
 
     inserirExemplar(exemplar: Estoque) {
         const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
-        if(id == -1){
+        if (id == -1) {
             this.estoqueList.push(exemplar);
         } else {
             throw new Error("Já existe um exemplar com o mesmo id");
@@ -26,7 +26,16 @@ export class EstoqueRepository {
         return this.estoqueList;
     }
 
-    buscarPorId(id: number){
+    buscarEstoqueLivro(livro_id: number) {
+        const livros = this.estoqueList.filter(e => e.livro_id == livro_id);
+        if (livros.length == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    buscarPorId(id: number) {
         const indice = this.estoqueList.findIndex(e => e.id == id);
         if (indice == -1) {
             throw new Error("Exemplar não encontrado");
@@ -37,7 +46,7 @@ export class EstoqueRepository {
 
     alterarExemplar(disponivel: boolean, id: number) {
         const exmp = this.buscarPorId(id);
-        if(disponivel){
+        if (disponivel) {
             exmp.disponivel = true
         } else {
             exmp.disponivel = false
@@ -45,7 +54,7 @@ export class EstoqueRepository {
         return exmp;
     }
 
-    excluirExemplar(id: number){
+    excluirExemplar(id: number) {
         const indice = this.estoqueList.findIndex(e => e.id == id);
         this.estoqueList.splice(indice);
     }
