@@ -28,5 +28,14 @@ class CursoRepository {
     buscarCursos() {
         return this.cursoList;
     }
+    verificarCurso(id) {
+        const indice = this.cursoList.findIndex(c => c.id == id);
+        if (indice == -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 }
 exports.CursoRepository = CursoRepository;

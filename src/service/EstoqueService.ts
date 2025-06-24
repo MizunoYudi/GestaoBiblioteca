@@ -4,9 +4,9 @@ import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
 
 export class EstoqueService {
-    estoqueRepository = EstoqueRepository.getInstance();
-    livroRepository = LivroRepository.getInstance();
-    emprestimoRepository = EmprestimoRepository.getInstance();
+    private estoqueRepository = EstoqueRepository.getInstance();
+    private livroRepository = LivroRepository.getInstance();
+    private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarExemplar(estoqueData: any) {
         const { id, livro_id, quantidade, quantidade_emprestada } = estoqueData;

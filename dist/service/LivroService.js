@@ -2,18 +2,35 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LivroService = void 0;
 const Livro_1 = require("../model/Livro");
+const CategoriaLivroRepository_1 = require("../repository/CategoriaLivroRepository");
+const EstoqueRepository_1 = require("../repository/EstoqueRepository");
 const LivroRepository_1 = require("../repository/LivroRepository");
 class LivroService {
     livroRepository = LivroRepository_1.LivroRepository.getInstance();
+    categoriaLivroRepository = CategoriaLivroRepository_1.CategoriaLivroRepository.getInstance();
+    estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
     cadastrarLivro(livroData) {
         const { id, titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
         if (!id || !titulo || !autor || !editora || !edicao || !isbn || !categoria_id) {
             throw new Error("Informações incompletas para o cadastro do livro");
         }
         const novoLivro = new Livro_1.Livro(parseInt(id), titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
-        if (!this.verificarSemelhantes(novoLivro.autor, novoLivro.editora, novoLivro.edicao)) {
+        if (this.validarLivro(novoLivro)) {
             this.livroRepository.inserirLivro(novoLivro);
             return novoLivro;
+        }
+    }
+    validarLivro(livro) {
+        if (this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)) {
+            if (!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)) {
+                return true;
+            }
+            else {
+                throw new Error("Já existe um livro com a mesma combinação de autor, editora e edição no sistema");
+            }
+        }
+        else {
+            throw new Error("Categoria inválida");
         }
     }
     verificarSemelhantes(autor, editora, edicao) {
@@ -23,11 +40,31 @@ class LivroService {
             return false;
         }
         else {
-            throw new Error("Já existe um livro com a mesma combinação de autor, editora e edição no sistema");
+            return true;
         }
     }
-    listarLivros() {
-        const livros = this.livroRepository.buscarLivros();
+    listarLivros(filtro, valor) {
+        let livros = this.livroRepository.buscarLivros();
+        if (filtro !== undefined && valor !== undefined) {
+            switch (filtro) {
+                case 1:
+                    const titulo = valor;
+                    livros = livros.filter(l => l.titulo === titulo);
+                    break;
+                case 2:
+                    const autor = valor;
+                    livros = livros.filter(l => l.autor === autor);
+                    break;
+                case 3:
+                    const editora = valor;
+                    livros = livros.filter(l => l.editora === editora);
+                    break;
+                case 4:
+                    const edicao = valor;
+                    livros = livros.filter(l => l.edicao === edicao);
+                    break;
+            }
+        }
         return livros;
     }
     filtrarPorISBN(isbn) {
@@ -42,7 +79,21 @@ class LivroService {
         }
     }
     removerLivro(isbn) {
-        this.livroRepository.excluirLivro(isbn);
+        const livro = this.filtrarPorISBN(isbn);
+        if (this.verificarEstoque(livro.id)) {
+            throw new Error("Possui um estoques relacionados");
+        }
+        else {
+            this.livroRepository.excluirLivro(isbn);
+        }
+    }
+    verificarEstoque(livro_id) {
+        if (this.estoqueRepository.buscarEstoqueLivro(livro_id)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 exports.LivroService = LivroService;

@@ -5,10 +5,10 @@ import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 
 export class UsuarioService {
-    usuarioRepository = UsuarioRepository.getInstance();
-    categoriaUsuarioRepository = CategoriaUsuarioRepository.getInstance();
-    cursoRepository = CursoRepository.getInstance();
-    emprestimoRepository = EmprestimoRepository.getInstance();
+    private usuarioRepository = UsuarioRepository.getInstance();
+    private categoriaUsuarioRepository = CategoriaUsuarioRepository.getInstance();
+    private cursoRepository = CursoRepository.getInstance();
+    private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarUsuario(usuarioData: any) {
         const { id, nome, cpf, ativo, categoria_id, curso_id } = usuarioData;
@@ -20,6 +20,50 @@ export class UsuarioService {
         if (this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)) {
             this.usuarioRepository.inserirUsuario(novoUsuario);
             return novoUsuario;
+        }
+    }
+
+    listarUsuarios(filtro?: number, valor?: any) {
+        let usuarios = this.usuarioRepository.buscarUsuarios();
+        if(filtro !== undefined && valor !== undefined){
+            switch(filtro){
+                case 1:
+                    const categoria = parseInt(valor);
+                    usuarios = usuarios.filter(u => u.categoria_id == categoria);
+                    break;
+                case 2:
+                    const curso = valor;
+                    usuarios = usuarios.filter(u => u.curso_id == curso);
+                    break;
+            }
+        }
+        return usuarios;
+    }
+
+    filtrarPorCPF(cpf: string) {
+        const usuario = this.usuarioRepository.buscarUsuarioCPF(cpf);
+        return usuario;
+    }
+
+    atualizarUsuario(usuarioData: any, cpf: string): Usuario {
+        const { nome, ativo, categoria_id, curso_id } = usuarioData;
+        return this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
+    }
+
+    removerUsuario(cpf: string) {
+        const usuario = this.filtrarPorCPF(cpf);
+        if (this.verificarEmprestimo(usuario.id)) {
+            throw new Error("Usuário possui emprestimos pendentes no sistema");
+        } else {
+            this.usuarioRepository.excluirUsuario(cpf);
+        }
+    }
+
+    verificarEmprestimo(usuario_id: number) {
+        if (this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -73,47 +117,4 @@ export class UsuarioService {
         }
     }
 
-    listarUsuarios(filtro?: number, valor?: any) {
-        let usuarios = this.usuarioRepository.buscarUsuarios();
-        if(filtro !== undefined && valor !== undefined){
-            switch(filtro){
-                case 1:
-                    const categoria = parseInt(valor);
-                    usuarios = usuarios.filter(u => u.categoria_id == categoria);
-                    break;
-                case 2:
-                    const curso = valor;
-                    usuarios = usuarios.filter(u => u.curso_id == curso);
-                    break;
-            }
-        }
-        return usuarios;
-    }
-
-    filtrarPorCPF(cpf: string) {
-        const usuario = this.usuarioRepository.buscarUsuarioCPF(cpf);
-        return usuario;
-    }
-
-    atualizarUsuario(usuarioData: any, cpf: string): Usuario {
-        const { nome, ativo, categoria_id, curso_id } = usuarioData;
-        return this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
-    }
-
-    removerUsuario(cpf: string) {
-        const usuario = this.filtrarPorCPF(cpf);
-        if (this.verificarEmprestimo(usuario.id)) {
-            throw new Error("Usuário possui emprestimos pendentes no sistema");
-        } else {
-            this.usuarioRepository.excluirUsuario(cpf);
-        }
-    }
-
-    verificarEmprestimo(usuario_id: number) {
-        if (this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }

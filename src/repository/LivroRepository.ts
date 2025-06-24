@@ -17,7 +17,7 @@ export class LivroRepository {
     inserirLivro(livro: Livro) {
         const isbn = this.livroList.map(l => l.isbn).indexOf(livro.isbn);
         const id = this.livroList.map(l => l.id).indexOf(livro.id);
-        if(isbn == -1 && id == -1){  
+        if (isbn == -1 && id == -1) {
             this.livroList.push(livro);
         } else {
             throw new Error("Já existe um livro com o mesmo isbn ou id no sistema");

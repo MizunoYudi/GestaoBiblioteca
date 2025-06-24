@@ -31,6 +31,24 @@ class EmprestimoRepository {
         }
         return this.emprestimoList[indice];
     }
+    buscarUsuarioEmprestimo(usuario_id) {
+        const usuario = this.emprestimoList.filter(e => e.usuario_id == usuario_id);
+        if (usuario.length == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    buscarEstoqueEmprestimo(estoque_id) {
+        const estoque = this.emprestimoList.filter(e => e.estoque_id == estoque_id);
+        if (estoque.length == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
     registrarDevolucao(entrega, atraso, suspensao, id) {
         const emp = this.buscarEmprestimoId(id);
         emp.data_entrega = entrega;

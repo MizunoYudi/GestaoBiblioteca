@@ -32,5 +32,14 @@ class CategoriaLivroRepository {
     buscarCategorias() {
         return this.categoriaLivroList;
     }
+    verificarCategoria(id) {
+        const indice = this.categoriaLivroList.findIndex(c => c.id == id);
+        if (indice == -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 }
 exports.CategoriaLivroRepository = CategoriaLivroRepository;

@@ -5,10 +5,10 @@ import { LivroRepository } from "../repository/LivroRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 
 export class EmprestimoService {
-    emprestimoRepository = EmprestimoRepository.getInstance();
-    usuarioRepository = UsuarioRepository.getInstance();
-    livroRepository = LivroRepository.getInstance();
-    estoqueRepository = EstoqueRepository.getInstance();
+    private emprestimoRepository = EmprestimoRepository.getInstance();
+    private usuarioRepository = UsuarioRepository.getInstance();
+    private livroRepository = LivroRepository.getInstance();
+    private estoqueRepository = EstoqueRepository.getInstance();
 
     cadastrarEmprestimo(empData: any) {
         const { id, usuario_id, estoque_id, data_emprestimo, data_devolucao } = empData;

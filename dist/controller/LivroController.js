@@ -18,7 +18,22 @@ class LivroController {
     }
     exibirLivros(req, res) {
         try {
-            const livros = livroService.listarLivros();
+            let livros;
+            if (req.query["titutlo"]) {
+                livros = livroService.listarLivros(1, req.query.titulo);
+            }
+            else if (req.query["autor"]) {
+                livros = livroService.listarLivros(2, req.query.autor);
+            }
+            else if (req.query["editora"]) {
+                livros = livroService.listarLivros(3, req.query.editora);
+            }
+            else if (req.query["edicao"]) {
+                livros = livroService.listarLivros(4, req.query.edicao);
+            }
+            else {
+                livros = livroService.listarLivros();
+            }
             res.status(200).json({
                 livros
             });

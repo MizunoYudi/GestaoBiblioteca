@@ -22,7 +22,7 @@ export class CategoriaLivroRepository {
             }
         ];
 
-    private constructor() {};
+    private constructor() { };
 
     public static getInstance(): CategoriaLivroRepository {
         if (!this.instance) {
@@ -35,9 +35,9 @@ export class CategoriaLivroRepository {
         return this.categoriaLivroList;
     }
 
-    verificarCategoria(id: number): boolean{
+    verificarCategoria(id: number): boolean {
         const indice = this.categoriaLivroList.findIndex(c => c.id == id);
-        if(indice == -1){
+        if (indice == -1) {
             return false;
         } else {
             return true;

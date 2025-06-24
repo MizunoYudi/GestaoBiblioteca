@@ -4,8 +4,8 @@ import { EstoqueService } from "../service/EstoqueService";
 const estoqueService = new EstoqueService();
 
 export class EstoqueController {
-    novoExemplar(req: Request, res: Response){
-        try{
+    novoExemplar(req: Request, res: Response) {
+        try {
             const novoExemplar = estoqueService.cadastrarExemplar(req.body);
             res.status(201).json({
                 mensagem: "Exemplar cadastrado!",
@@ -16,8 +16,8 @@ export class EstoqueController {
         }
     }
 
-    exibirExemplares(req: Request, res: Response){
-        try{
+    exibirExemplares(req: Request, res: Response) {
+        try {
             const exemplares = estoqueService.listarExemplares();
             res.status(200).json({
                 exemplares
@@ -27,8 +27,8 @@ export class EstoqueController {
         }
     }
 
-    filtrarExemplarPorId(req: Request, res: Response){
-        try{
+    filtrarExemplarPorId(req: Request, res: Response) {
+        try {
             const id = parseInt(req.params.id);
             const exemplar = estoqueService.filtrarPorId(id);
             res.status(200).json({
@@ -40,13 +40,13 @@ export class EstoqueController {
         }
     }
 
-    atualizarDiponibilidade(req: Request, res: Response){
-        try{
+    atualizarDiponibilidade(req: Request, res: Response) {
+        try {
             const id = parseInt(req.params.id);
             const exemplar = estoqueService.atualizarDisponibilidade(req.body.disponivel, id);
-            if(typeof req.body.disponivel == 'undefined'){
+            if (typeof req.body.disponivel == 'undefined') {
                 res.status(401).json({
-                    Status: "Error", 
+                    Status: "Error",
                     mensagem: "Insira a disponibilidade para poder altera-la"
                 });
             }
@@ -59,8 +59,8 @@ export class EstoqueController {
         }
     }
 
-    apagarExemplar(req: Request, res: Response){
-        try{
+    apagarExemplar(req: Request, res: Response) {
+        try {
             const id = parseInt(req.params.id);
             estoqueService.removerExemplar(id);
             res.status(200).json({

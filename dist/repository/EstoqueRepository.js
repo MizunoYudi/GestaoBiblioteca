@@ -23,6 +23,15 @@ class EstoqueRepository {
     buscarExemplares() {
         return this.estoqueList;
     }
+    buscarEstoqueLivro(livro_id) {
+        const livros = this.estoqueList.filter(e => e.livro_id == livro_id);
+        if (livros.length == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
     buscarPorId(id) {
         const indice = this.estoqueList.findIndex(e => e.id == id);
         if (indice == -1) {
