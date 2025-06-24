@@ -68,19 +68,4 @@ export class UsuarioController {
             res.status(400).json({ Status: "Error", mensagem: e.message });
         }
     }
-
-    teste(req: Request, res: Response) {
-        try {
-            if (req.query["categoria_id"]) {
-
-            }
-            const query = req.query;
-            console.log(req.query);
-            res.status(200).json({
-                query
-            })
-        } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
-        }
-    }
 }
