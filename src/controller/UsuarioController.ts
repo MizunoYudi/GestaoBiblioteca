@@ -18,7 +18,14 @@ export class UsuarioController {
 
     exibirUsuarios(req: Request, res: Response) {
         try {
-            const usuarios = usuarioService.listarUsuarios();
+            let usuarios;
+            if (req.query["categoria_id"]) {
+                usuarios = usuarioService.listarUsuarios(1, req.query.categoria_id);
+            } else if (req.query["curso_id"]) {
+                usuarios = usuarioService.listarUsuarios(2, req.query.curso_id);
+            } else {
+                usuarios = usuarioService.listarUsuarios();
+            }
             res.status(200).json({
                 usuarios
             });
@@ -57,6 +64,21 @@ export class UsuarioController {
             res.status(200).json({
                 mensagem: "Usuário removido com sucesso!"
             });
+        } catch (e: any) {
+            res.status(400).json({ Status: "Error", mensagem: e.message });
+        }
+    }
+
+    teste(req: Request, res: Response) {
+        try {
+            if (req.query["categoria_id"]) {
+
+            }
+            const query = req.query;
+            console.log(req.query);
+            res.status(200).json({
+                query
+            })
         } catch (e: any) {
             res.status(400).json({ Status: "Error", mensagem: e.message });
         }

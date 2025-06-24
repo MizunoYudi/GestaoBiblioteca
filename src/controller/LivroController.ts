@@ -18,7 +18,20 @@ export class LivroController {
 
     exibirLivros(req: Request, res: Response) {
         try {
-            const livros = livroService.listarLivros();
+            let livros;
+
+            if (req.query["titutlo"]) {
+                livros = livroService.listarLivros(1, req.query.titulo);
+            } else if (req.query["autor"]) {
+                livros = livroService.listarLivros(2, req.query.autor);
+            } else if (req.query["editora"]) {
+                livros = livroService.listarLivros(3, req.query.editora);
+            } else if (req.query["edicao"]) {
+                livros = livroService.listarLivros(4, req.query.edicao);
+            } else {
+                livros = livroService.listarLivros();
+            }
+
             res.status(200).json({
                 livros
             });
@@ -46,7 +59,7 @@ export class LivroController {
                 mensagem: "Livro atualizado com sucesso!",
                 livro_atualizado: livro
             });
-        } catch (e: any){
+        } catch (e: any) {
             res.status(400).json({ Status: "Error", mensagem: e.message });
         }
     }
@@ -57,7 +70,7 @@ export class LivroController {
             res.status(200).json({
                 mensagem: "Livro removido com sucesso!"
             });
-        } catch(e: any) {
+        } catch (e: any) {
             res.status(400).json({ Status: "Error", mensagem: e.message });
         }
     }
