@@ -1,19 +1,25 @@
 import { Estoque } from "../model/Estoque";
+import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
+import { LivroRepository } from "../repository/LivroRepository";
 
 export class EstoqueService {
     estoqueRepository = EstoqueRepository.getInstance();
+    livroRepository = LivroRepository.getInstance();
+    emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarExemplar(estoqueData: any) {
         const { id, livro_id, quantidade, quantidade_emprestada } = estoqueData;
 
-        if (!id || !livro_id || !quantidade || !quantidade_emprestada) {
+        if (!id || !livro_id || !quantidade) {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
 
         const novoExemplar = new Estoque(parseInt(id), parseInt(livro_id), parseInt(quantidade), parseInt(quantidade_emprestada), true);
-        this.estoqueRepository.inserirExemplar(novoExemplar);
-        return novoExemplar;
+        if (this.livroRepository.buscarLivroId(livro_id)) {
+            this.estoqueRepository.inserirExemplar(novoExemplar);
+            return novoExemplar;
+        }
     }
 
     listarExemplares() {
@@ -32,6 +38,18 @@ export class EstoqueService {
     }
 
     removerExemplar(id: number) {
-        this.estoqueRepository.excluirExemplar(id);
+        if (this.verificarEmprestimo(id)) {
+            throw new Error("Possui emprestimos pendentes com tais exemplares");
+        } else {
+            this.estoqueRepository.excluirExemplar(id);
+        }
+    }
+
+    verificarEmprestimo(estoque_id: number) {
+        if (this.emprestimoRepository.buscarEstoqueEmprestimo(estoque_id)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
