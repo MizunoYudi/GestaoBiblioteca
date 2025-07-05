@@ -15,6 +15,10 @@ export class CursoRepository {
             {
                 id: 3,
                 nome: "Administração"
+            },
+            {
+                id: 4,
+                nome: "Sem curso"
             }
         ];
 
