@@ -12,18 +12,20 @@ class UsuarioService {
     cursoRepository = CursoRepository_1.CursoRepository.getInstance();
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     cadastrarUsuario(usuarioData) {
-        const { id, nome, cpf, ativo, categoria_id, curso_id } = usuarioData;
-        if (!id || !nome || !cpf || !ativo || !categoria_id || !curso_id) {
+        const { nome, cpf, categoria_id, curso_id } = usuarioData;
+        if (!nome || !cpf || !categoria_id || !curso_id) {
             throw new Error("Informações incompletas para o cadastro do usuário");
         }
-        const novoUsuario = new Usuario_1.Usuario(parseInt(id), nome, cpf, ativo, parseInt(categoria_id), parseInt(curso_id));
+        const novoUsuario = new Usuario_1.Usuario(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
         if (this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)) {
             this.usuarioRepository.inserirUsuario(novoUsuario);
             return novoUsuario;
         }
     }
-    listarUsuarios(filtro, valor) {
-        let usuarios = this.usuarioRepository.buscarUsuarios();
+    listarUsuarios() {
+        return this.usuarioRepository.buscarUsuarios();
+    }
+    filtrarUsuarios(usuarios, filtro, valor) {
         if (filtro !== undefined && valor !== undefined) {
             switch (filtro) {
                 case 1:

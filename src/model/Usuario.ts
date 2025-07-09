@@ -7,18 +7,18 @@ export class Usuario {
     curso_id: number;
 
     constructor(
-        id: number,
         nome: string,
         cpf: string,
         categoria_id: number,
         curso_id: number,
+        id?: number,
         ativo?: string
     ) {
-        this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.categoria_id = categoria_id;
         this.curso_id = curso_id;
+        this.id = id || 0;
         this.ativo = ativo || 'ativo';
     }
 }

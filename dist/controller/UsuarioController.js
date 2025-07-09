@@ -18,15 +18,12 @@ class UsuarioController {
     }
     exibirUsuarios(req, res) {
         try {
-            let usuarios;
+            let usuarios = usuarioService.listarUsuarios();
             if (req.query["categoria_id"]) {
-                usuarios = usuarioService.listarUsuarios(1, req.query.categoria_id);
+                usuarios = usuarioService.filtrarUsuarios(usuarios, 1, req.query.categoria_id);
             }
-            else if (req.query["curso_id"]) {
-                usuarios = usuarioService.listarUsuarios(2, req.query.curso_id);
-            }
-            else {
-                usuarios = usuarioService.listarUsuarios();
+            if (req.query["curso_id"]) {
+                usuarios = usuarioService.filtrarUsuarios(usuarios, 2, req.query.curso_id);
             }
             res.status(200).json({
                 usuarios

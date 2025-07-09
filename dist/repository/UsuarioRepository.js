@@ -4,6 +4,7 @@ exports.UsuarioRepository = void 0;
 class UsuarioRepository {
     static instance;
     usuarioList = [];
+    cont = 0;
     static getInstance() {
         if (!this.instance) {
             this.instance = new UsuarioRepository();
@@ -11,6 +12,7 @@ class UsuarioRepository {
         return this.instance;
     }
     inserirUsuario(usuario) {
+        usuario.id = this.cont++;
         const cpf = this.usuarioList.map(u => u.cpf).indexOf(usuario.cpf);
         const id = this.usuarioList.map(u => u.id).indexOf(usuario.id);
         if (cpf == -1 && id == -1) {
