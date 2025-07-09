@@ -9,14 +9,14 @@ class Livro {
     edicao;
     isbn;
     categoria_id;
-    constructor(id, titulo, autor, editora, edicao, isbn, categoria_id) {
-        this.id = id;
+    constructor(titulo, autor, editora, edicao, isbn, categoria_id, id) {
         this.titulo = titulo;
         this.autor = autor;
         this.editora = editora;
         this.edicao = edicao;
         this.isbn = isbn;
         this.categoria_id = categoria_id;
+        this.id = id || 0;
     }
 }
 exports.Livro = Livro;

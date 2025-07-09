@@ -10,11 +10,11 @@ class LivroService {
     categoriaLivroRepository = CategoriaLivroRepository_1.CategoriaLivroRepository.getInstance();
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
     cadastrarLivro(livroData) {
-        const { id, titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
-        if (!id || !titulo || !autor || !editora || !edicao || !isbn || !categoria_id) {
+        const { titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
+        if (!titulo || !autor || !editora || !edicao || !isbn || !categoria_id) {
             throw new Error("Informações incompletas para o cadastro do livro");
         }
-        const novoLivro = new Livro_1.Livro(parseInt(id), titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
+        const novoLivro = new Livro_1.Livro(titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
         if (this.validarLivro(novoLivro)) {
             this.livroRepository.inserirLivro(novoLivro);
             return novoLivro;
@@ -43,8 +43,10 @@ class LivroService {
             return true;
         }
     }
-    listarLivros(filtro, valor) {
-        let livros = this.livroRepository.buscarLivros();
+    listarLivros() {
+        return this.livroRepository.buscarLivros();
+    }
+    filtrarLivros(livros, filtro, valor) {
         if (filtro !== undefined && valor !== undefined) {
             switch (filtro) {
                 case 1:
@@ -81,7 +83,7 @@ class LivroService {
     removerLivro(isbn) {
         const livro = this.filtrarPorISBN(isbn);
         if (this.verificarEstoque(livro.id)) {
-            throw new Error("Possui um estoques relacionados");
+            throw new Error("Possui um estoque relacionado");
         }
         else {
             this.livroRepository.excluirLivro(isbn);

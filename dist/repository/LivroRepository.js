@@ -14,6 +14,7 @@ class LivroRepository {
         return this.instance;
     }
     inserirLivro(livro) {
+        livro.id = this.cont++;
         const isbn = this.livroList.map(l => l.isbn).indexOf(livro.isbn);
         const id = this.livroList.map(l => l.id).indexOf(livro.id);
         if (isbn == -1 && id == -1) {

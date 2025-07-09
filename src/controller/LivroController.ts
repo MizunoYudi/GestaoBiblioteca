@@ -18,20 +18,20 @@ export class LivroController {
 
     exibirLivros(req: Request, res: Response) {
         try {
-            let livros;
+            let livros = livroService.listarLivros();
 
             if (req.query["titutlo"]) {
-                livros = livroService.listarLivros(1, req.query.titulo);
-            } else if (req.query["autor"]) {
-                livros = livroService.listarLivros(2, req.query.autor);
-            } else if (req.query["editora"]) {
-                livros = livroService.listarLivros(3, req.query.editora);
-            } else if (req.query["edicao"]) {
-                livros = livroService.listarLivros(4, req.query.edicao);
-            } else {
-                livros = livroService.listarLivros();
+                livros = livroService.filtrarLivros(livros, 1, req.query.titulo);
             }
-
+            if (req.query["autor"]) {
+                livros = livroService.filtrarLivros(livros, 2, req.query.autor);
+            }
+            if (req.query["editora"]) {
+                livros = livroService.filtrarLivros(livros, 3, req.query.editora);
+            }
+            if (req.query["edicao"]) {
+                livros = livroService.filtrarLivros(livros, 4, req.query.edicao);
+            }
             res.status(200).json({
                 livros
             });
