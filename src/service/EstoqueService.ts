@@ -33,8 +33,12 @@ export class EstoqueService {
     }
 
     atualizarDisponibilidade(disponivel: boolean, id: number) {
-        const exemplar = this.estoqueRepository.alterarExemplar(disponivel, id);
-        return exemplar;
+        const exmp = this.estoqueRepository.buscarPorId(id);
+        if(exmp.quantidade == exmp.quantidade_emprestada){
+            throw new Error(`Não é possível atualizar a disponibilidade do estoque: quantidade de exemplares emprestados exedidos. Quantidade total: ${exmp.quantidade}, Quantidade emprestada: ${exmp.quantidade_emprestada}`)
+        }
+        const exemplar_atualizado = this.estoqueRepository.alterarExemplar(disponivel, id);
+        return exemplar_atualizado;
     }
 
     removerExemplar(id: number) {

@@ -16,11 +16,11 @@ export class EstoqueRepository {
 
     inserirExemplar(exemplar: Estoque) {
         exemplar.id = this.cont++;
-        const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
-        if (id == -1) {
+        const similar = this.estoqueList.findIndex(e => e.livro_id == exemplar.livro_id);
+        if (similar == -1) {
             this.estoqueList.push(exemplar);
         } else {
-            throw new Error("Já existe um exemplar com o mesmo id");
+            throw new Error("Já existe um estoque do mesmo livro");
         }
     }
 
