@@ -4,7 +4,7 @@ exports.LivroRepository = void 0;
 class LivroRepository {
     static instance;
     livroList = [];
-    cont = 0;
+    cont = 1;
     constructor() { }
     ;
     static getInstance() {

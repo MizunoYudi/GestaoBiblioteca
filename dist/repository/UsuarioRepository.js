@@ -4,7 +4,7 @@ exports.UsuarioRepository = void 0;
 class UsuarioRepository {
     static instance;
     usuarioList = [];
-    cont = 0;
+    cont = 1;
     static getInstance() {
         if (!this.instance) {
             this.instance = new UsuarioRepository();

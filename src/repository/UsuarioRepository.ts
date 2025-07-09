@@ -3,7 +3,7 @@ import { Usuario } from "../model/Usuario";
 export class UsuarioRepository {
     private static instance: UsuarioRepository;
     private usuarioList: Usuario[] = [];
-    private cont: number = 0;
+    private cont: number = 1;
 
     public static getInstance(): UsuarioRepository {
         if (!this.instance) {

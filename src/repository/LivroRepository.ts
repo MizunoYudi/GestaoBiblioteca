@@ -3,7 +3,7 @@ import { Livro } from "../model/Livro";
 export class LivroRepository {
     private static instance: LivroRepository;
     private livroList: Livro[] = [];
-    private cont: number = 0;
+    private cont: number = 1;
 
     private constructor() { };
 
