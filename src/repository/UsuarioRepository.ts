@@ -3,6 +3,7 @@ import { Usuario } from "../model/Usuario";
 export class UsuarioRepository {
     private static instance: UsuarioRepository;
     private usuarioList: Usuario[] = [];
+    private cont: number = 0;
 
     public static getInstance(): UsuarioRepository {
         if (!this.instance) {
@@ -12,6 +13,7 @@ export class UsuarioRepository {
     }
 
     inserirUsuario(usuario: Usuario) {
+        usuario.id = this.cont++;
         const cpf = this.usuarioList.map(u => u.cpf).indexOf(usuario.cpf);
         const id = this.usuarioList.map(u => u.id).indexOf(usuario.id);
         if (cpf == -1 && id == -1) {
