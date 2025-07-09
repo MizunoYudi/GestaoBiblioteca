@@ -38,20 +38,25 @@ class EmprestimoService {
         const data = new Date();
         const atraso = this.calcularAtraso(emp);
         this.emprestimoRepository.registrarDevolucao(data, atraso.dias, atraso.data, id);
-        this.atualizarStatusUsuario(emp);
     }
-    atualizarStatusUsuario(emp) {
-        const emp_usuario = this.obterEmprestimosUsuario(emp.usuario_id);
-        const usuario = this.usuarioRepository.buscarUsuarioId(emp.usuario_id);
-        const dias_suspensao = this.calcularAtraso(emp).dias_suspensao;
-        if (dias_suspensao > 60) {
-            if (emp_usuario.filter(e => e.dias_atraso > 20).length > 2) {
-                usuario.ativo = "inativo";
+    atualizarStatusUsuarios() {
+        setInterval(() => {
+            const usuarios = this.usuarioRepository.buscarUsuarios();
+            for (const u of usuarios) {
+                const emprestimos = this.obterEmprestimosUsuario(u.id).filter(e => new Date() > e.data_devolucao);
+                for (const e of emprestimos) {
+                    const data_suspensao = this.calcularAtraso(e);
+                    e.dias_atraso = data_suspensao.dias;
+                    e.suspensao_ate = data_suspensao.data;
+                    if (data_suspensao.dias_suspensao > 60) {
+                        u.ativo = "inativo";
+                    }
+                    else {
+                        u.ativo = "suspenso";
+                    }
+                }
             }
-            else {
-                usuario.ativo = "suspenso";
-            }
-        }
+        }, 500);
     }
     atualizarEstoque(estoque_id) {
         const estoque = this.estoqueRepository.buscarPorId(estoque_id);
@@ -94,7 +99,6 @@ class EmprestimoService {
         this.verificarUsuarioAtivo(usuario_id);
         this.verificarEstoque(estoque_id);
         this.verificarLimiteLivros(usuario_id, estoque_id);
-        this.atualizarStatusUsuario(emp);
         this.verificarLivrosSuspensos(usuario_id);
         return true;
     }

@@ -6,6 +6,7 @@ import { LivroController } from "./controller/LivroController";
 import { UsuarioController } from "./controller/UsuarioController";
 import { EstoqueController } from "./controller/EstoqueController";
 import { EmprestimoController } from "./controller/EmprestimoController";
+import { EmprestimoService } from "./service/EmprestimoService";
 const app = express();
 const PORT = process.env.PORT ?? 3090
 app.use(express.json());
@@ -17,6 +18,9 @@ const livroController = new LivroController();
 const usuarioController = new UsuarioController();
 const estoqueController = new EstoqueController();
 const emprestimoController = new EmprestimoController();
+const emprestimoService = new EmprestimoService();
+
+emprestimoService.atualizarStatusUsuarios();
 
 app.get('/library/categorias-livro', categoriaLivroController.exibirCategoriaLivro);
 app.get('/library/categorias-usuario', categoriaUsuarioController.exibirCategoriaUsuario);
