@@ -3,6 +3,7 @@ import { Estoque } from "../model/Estoque";
 export class EstoqueRepository {
     private static instance: EstoqueRepository;
     private estoqueList: Estoque[] = [];
+    private cont: number = 1;
 
     private constructor() { }
 
@@ -14,6 +15,7 @@ export class EstoqueRepository {
     }
 
     inserirExemplar(exemplar: Estoque) {
+        exemplar.id = this.cont++;
         const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
         if (id == -1) {
             this.estoqueList.push(exemplar);

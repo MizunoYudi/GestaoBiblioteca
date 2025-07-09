@@ -9,13 +9,13 @@ export class EstoqueService {
     private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarExemplar(estoqueData: any) {
-        const { id, livro_id, quantidade, quantidade_emprestada } = estoqueData;
+        const { livro_id, quantidade } = estoqueData;
 
-        if (!id || !livro_id || !quantidade) {
+        if (!livro_id|| quantidade == undefined) {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
 
-        const novoExemplar = new Estoque(parseInt(id), parseInt(livro_id), parseInt(quantidade), parseInt(quantidade_emprestada), true);
+        const novoExemplar = new Estoque(parseInt(livro_id), parseInt(quantidade));
         if (this.livroRepository.buscarLivroId(livro_id)) {
             this.estoqueRepository.inserirExemplar(novoExemplar);
             return novoExemplar;

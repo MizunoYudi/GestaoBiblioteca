@@ -10,11 +10,11 @@ class EstoqueService {
     livroRepository = LivroRepository_1.LivroRepository.getInstance();
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     cadastrarExemplar(estoqueData) {
-        const { id, livro_id, quantidade, quantidade_emprestada } = estoqueData;
-        if (!id || !livro_id || !quantidade) {
+        const { livro_id, quantidade } = estoqueData;
+        if (!livro_id || quantidade == undefined) {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
-        const novoExemplar = new Estoque_1.Estoque(parseInt(id), parseInt(livro_id), parseInt(quantidade), parseInt(quantidade_emprestada), true);
+        const novoExemplar = new Estoque_1.Estoque(parseInt(livro_id), parseInt(quantidade));
         if (this.livroRepository.buscarLivroId(livro_id)) {
             this.estoqueRepository.inserirExemplar(novoExemplar);
             return novoExemplar;

@@ -4,6 +4,7 @@ exports.EstoqueRepository = void 0;
 class EstoqueRepository {
     static instance;
     estoqueList = [];
+    cont = 1;
     constructor() { }
     static getInstance() {
         if (!this.instance) {
@@ -12,6 +13,7 @@ class EstoqueRepository {
         return this.instance;
     }
     inserirExemplar(exemplar) {
+        exemplar.id = this.cont++;
         const id = this.estoqueList.map(e => e.id).indexOf(exemplar.id);
         if (id == -1) {
             this.estoqueList.push(exemplar);

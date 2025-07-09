@@ -7,12 +7,12 @@ class Estoque {
     quantidade;
     quantidade_emprestada;
     disponivel;
-    constructor(id, livro_id, quantidade, quantidade_emprestada, disponivel) {
-        this.id = id;
+    constructor(livro_id, quantidade, quantidade_emprestada, disponivel, id) {
         this.livro_id = livro_id;
         this.quantidade = quantidade;
-        this.quantidade_emprestada = quantidade_emprestada;
-        this.disponivel = disponivel;
+        this.quantidade_emprestada = quantidade_emprestada || 0;
+        this.disponivel = disponivel || true;
+        this.id = id || 0;
     }
 }
 exports.Estoque = Estoque;
