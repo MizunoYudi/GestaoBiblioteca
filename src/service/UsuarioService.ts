@@ -11,20 +11,23 @@ export class UsuarioService {
     private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarUsuario(usuarioData: any) {
-        const { nome, cpf, ativo, categoria_id, curso_id } = usuarioData;
-        if (!nome || !cpf || !ativo || !categoria_id || !curso_id) {
+        const { nome, cpf, categoria_id, curso_id } = usuarioData;
+        if (!nome || !cpf || !categoria_id || !curso_id) {
             throw new Error("Informações incompletas para o cadastro do usuário");
         }
 
-        const novoUsuario = new Usuario(nome, cpf, ativo, parseInt(categoria_id), parseInt(curso_id));
+        const novoUsuario = new Usuario(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
         if (this.validarCPF(novoUsuario.cpf) && this.validarUsuario(novoUsuario)) {
             this.usuarioRepository.inserirUsuario(novoUsuario);
             return novoUsuario;
         }
     }
 
-    listarUsuarios(filtro?: number, valor?: any) {
-        let usuarios = this.usuarioRepository.buscarUsuarios();
+    listarUsuarios(): Usuario[] {
+        return this.usuarioRepository.buscarUsuarios();
+    }
+
+    filtrarUsuarios(usuarios: Usuario[], filtro?: number, valor?: any) {
         if(filtro !== undefined && valor !== undefined){
             switch(filtro){
                 case 1:
