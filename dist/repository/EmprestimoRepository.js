@@ -4,6 +4,7 @@ exports.EmprestimoRepository = void 0;
 class EmprestimoRepository {
     static instance;
     emprestimoList = [];
+    cont = 1;
     constructor() { }
     ;
     static getInstance() {
@@ -13,6 +14,7 @@ class EmprestimoRepository {
         return this.instance;
     }
     inserirEmprestimo(emprestimo) {
+        emprestimo.id = this.cont++;
         const id = this.emprestimoList.findIndex(e => e.id == emprestimo.id);
         if (id == -1) {
             this.emprestimoList.push(emprestimo);
