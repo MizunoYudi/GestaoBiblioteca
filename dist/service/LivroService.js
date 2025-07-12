@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LivroService = void 0;
 const Livro_1 = require("../model/Livro");
-const CategoriaLivroRepository_1 = require("../repository/CategoriaLivroRepository");
 const EstoqueRepository_1 = require("../repository/EstoqueRepository");
 const LivroRepository_1 = require("../repository/LivroRepository");
+const CategoriaLivroService_1 = require("./CategoriaLivroService");
 class LivroService {
     livroRepository = LivroRepository_1.LivroRepository.getInstance();
-    categoriaLivroRepository = CategoriaLivroRepository_1.CategoriaLivroRepository.getInstance();
+    categoriaLivroService = new CategoriaLivroService_1.CategoriaLivroService();
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
     cadastrarLivro(livroData) {
         const { titulo, autor, editora, edicao, isbn, categoria_id } = livroData;
@@ -21,7 +21,7 @@ class LivroService {
         }
     }
     validarLivro(livro) {
-        if (this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)) {
+        if (this.categoriaLivroService.validarCategoriaLivro(livro.categoria_id)) {
             if (!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)) {
                 return true;
             }

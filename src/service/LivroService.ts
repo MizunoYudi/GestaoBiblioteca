@@ -2,10 +2,11 @@ import { Livro } from "../model/Livro";
 import { CategoriaLivroRepository } from "../repository/CategoriaLivroRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
+import { CategoriaLivroService } from "./CategoriaLivroService";
 
 export class LivroService {
     private livroRepository = LivroRepository.getInstance();
-    private categoriaLivroRepository = CategoriaLivroRepository.getInstance();
+    private categoriaLivroService = new CategoriaLivroService();
     private estoqueRepository = EstoqueRepository.getInstance();
 
     cadastrarLivro(livroData: any) {
@@ -22,7 +23,7 @@ export class LivroService {
     }
 
     validarLivro(livro: Livro): boolean {
-        if (this.categoriaLivroRepository.verificarCategoria(livro.categoria_id)) {
+        if (this.categoriaLivroService.validarCategoriaLivro(livro.categoria_id)) {
             if (!this.verificarSemelhantes(livro.autor, livro.editora, livro.edicao)) {
                 return true;
             } else {

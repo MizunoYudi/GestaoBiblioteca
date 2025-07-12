@@ -7,5 +7,8 @@ class CategoriaLivroService {
     listarCategoriaLivro() {
         return this.categoriaRepository.buscarCategorias();
     }
+    validarCategoriaLivro(id_categoria) {
+        return this.categoriaRepository.verificarCategoria(id_categoria);
+    }
 }
 exports.CategoriaLivroService = CategoriaLivroService;

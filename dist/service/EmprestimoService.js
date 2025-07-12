@@ -42,22 +42,20 @@ class EmprestimoService {
     }
     atualizarStatusUsuarios() {
         setInterval(() => {
-            const usuarios = this.usuarioRepository.buscarUsuarios();
-            for (const u of usuarios) {
-                const emprestimos = this.obterEmprestimosUsuario(u.id).filter(e => new Date() > e.data_devolucao);
-                for (const e of emprestimos) {
-                    const data_suspensao = this.calcularAtraso(e);
-                    e.dias_atraso = data_suspensao.dias;
-                    e.suspensao_ate = data_suspensao.data;
-                    if (data_suspensao.dias_suspensao > 60) {
-                        u.ativo = "inativo";
-                    }
-                    else {
-                        u.ativo = "suspenso";
-                    }
+            const emprestimos = this.emprestimoRepository.buscarEmprestimos().filter(e => new Date() > e.data_devolucao);
+            for (const e of emprestimos) {
+                const usuario = this.usuarioRepository.buscarUsuarioId(e.usuario_id);
+                const data_suspensao = this.calcularAtraso(e);
+                e.dias_atraso = data_suspensao.dias;
+                e.suspensao_ate = data_suspensao.data;
+                if (data_suspensao.dias_suspensao > 60) {
+                    usuario.ativo = "inativo";
+                }
+                else {
+                    usuario.ativo = "suspenso";
                 }
             }
-        }, 500);
+        }, 360000);
     }
     emprestarEstoque(estoque_id) {
         const estoque = this.estoqueRepository.buscarPorId(estoque_id);
@@ -89,8 +87,6 @@ class EmprestimoService {
         const emp_usuario = this.emprestimoRepository.buscarEmprestimos().filter(e => e.usuario_id == usuario.id);
         const permissoes = this.permissoesEmprestimo(usuario_id, estoque_id);
         const emp_ativo = emp_usuario.filter(e => e.data_entrega == undefined);
-        console.log("aaa", emp_ativo, emp_ativo.length + 1);
-        console.log("bbb", emp_usuario);
         if (emp_ativo.length + 1 > permissoes.livros) {
             throw new Error(`Usuário está no limite de livros emprestados. Quantidade permitida: ${permissoes.livros}. Quantidade emprestada: ${emp_usuario.length}`);
         }

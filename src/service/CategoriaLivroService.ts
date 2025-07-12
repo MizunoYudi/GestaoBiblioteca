@@ -6,4 +6,8 @@ export class CategoriaLivroService {
     listarCategoriaLivro() {
         return this.categoriaRepository.buscarCategorias();
     }
+
+    validarCategoriaLivro(id_categoria: number): boolean{
+        return this.categoriaRepository.verificarCategoria(id_categoria);
+    }
 }
