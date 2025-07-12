@@ -49,21 +49,19 @@ export class EmprestimoService {
 
     atualizarStatusUsuarios(){
         setInterval(()=>{
-            const usuarios = this.usuarioRepository.buscarUsuarios();
-            for(const u of usuarios){
-                const emprestimos = this.obterEmprestimosUsuario(u.id).filter(e => new Date() > e.data_devolucao);
-                for(const e of emprestimos){
-                    const data_suspensao = this.calcularAtraso(e);
-                    e.dias_atraso = data_suspensao.dias
-                    e.suspensao_ate = data_suspensao.data;
-                    if(data_suspensao.dias_suspensao > 60){
-                        u.ativo = "inativo";
-                    } else {
-                        u.ativo = "suspenso";
-                    }
+            const emprestimos = this.emprestimoRepository.buscarEmprestimos().filter(e => new Date() > e.data_devolucao);
+            for(const e of emprestimos){
+                const usuario = this.usuarioRepository.buscarUsuarioId(e.usuario_id);
+                const data_suspensao = this.calcularAtraso(e);
+                e.dias_atraso = data_suspensao.dias
+                e.suspensao_ate = data_suspensao.data;
+                if(data_suspensao.dias_suspensao > 60){
+                    usuario.ativo = "inativo";
+                } else {
+                    usuario.ativo = "suspenso";
                 }
             }
-        }, 500);
+        }, 360000);
     }
 
     emprestarEstoque(estoque_id: number) {
