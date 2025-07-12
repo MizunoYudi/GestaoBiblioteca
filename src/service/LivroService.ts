@@ -1,5 +1,4 @@
 import { Livro } from "../model/Livro";
-import { CategoriaLivroRepository } from "../repository/CategoriaLivroRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
 import { CategoriaLivroService } from "./CategoriaLivroService";
