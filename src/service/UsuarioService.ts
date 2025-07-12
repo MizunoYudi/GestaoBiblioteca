@@ -1,13 +1,14 @@
 import { Usuario } from "../model/Usuario";
-import { CategoriaUsuarioRepository } from "../repository/CategoriaUsuarioRepository";
+import { CategoriaUsuarioService } from "../service/CategoriaUsuarioService";
 import { CursoRepository } from "../repository/CursoRepository";
 import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
+import { CursoService } from "./CursoService";
 
 export class UsuarioService {
     private usuarioRepository = UsuarioRepository.getInstance();
-    private categoriaUsuarioRepository = CategoriaUsuarioRepository.getInstance();
-    private cursoRepository = CursoRepository.getInstance();
+    private categoriaUsuarioService = new CategoriaUsuarioService();
+    private cursoService = new CursoService();
     private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarUsuario(usuarioData: any) {
@@ -71,8 +72,8 @@ export class UsuarioService {
     }
 
     validarUsuario(usuario: Usuario): boolean {
-        const curso = this.cursoRepository.verificarCurso(usuario.curso_id);
-        const categoria = this.categoriaUsuarioRepository.verificarCategoria(usuario.categoria_id);
+        const curso = this.cursoService.validarCurso(usuario.curso_id);
+        const categoria = this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
         if (categoria) {
             if (curso) {
                 return true;
@@ -80,7 +81,11 @@ export class UsuarioService {
                 throw new Error("Curso inválido");
             }
         } else {
-            throw new Error("Categoria inválida");
+            if(!curso){
+                throw new Error("Categoria e curso inválidos");
+            } else {
+                throw new Error("Categoria inválida");
+            }
         }
     }
 }

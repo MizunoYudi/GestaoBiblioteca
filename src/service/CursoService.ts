@@ -6,4 +6,8 @@ export class CursoService {
     listarCursos(){
         return this.cursoRepository.buscarCursos();
     }
+
+    validarCurso(id_curso: number){
+        return this.cursoRepository.verificarCurso(id_curso);
+    }
 }

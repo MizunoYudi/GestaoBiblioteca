@@ -6,4 +6,8 @@ export class CategoriaUsuarioService {
     listarCategoriaUsuario() {
         return this.categoriaRepository.buscarCategorias();
     }
+
+    validarCategoriaUsuario(id_categoria: number) {
+        return this.categoriaRepository.verificarCategoria(id_categoria);
+    }
 }

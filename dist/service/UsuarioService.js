@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuarioService = void 0;
 const Usuario_1 = require("../model/Usuario");
-const CategoriaUsuarioRepository_1 = require("../repository/CategoriaUsuarioRepository");
-const CursoRepository_1 = require("../repository/CursoRepository");
+const CategoriaUsuarioService_1 = require("../service/CategoriaUsuarioService");
 const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
 const UsuarioRepository_1 = require("../repository/UsuarioRepository");
+const CursoService_1 = require("./CursoService");
 class UsuarioService {
     usuarioRepository = UsuarioRepository_1.UsuarioRepository.getInstance();
-    categoriaUsuarioRepository = CategoriaUsuarioRepository_1.CategoriaUsuarioRepository.getInstance();
-    cursoRepository = CursoRepository_1.CursoRepository.getInstance();
+    categoriaUsuarioService = new CategoriaUsuarioService_1.CategoriaUsuarioService();
+    cursoService = new CursoService_1.CursoService();
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     cadastrarUsuario(usuarioData) {
         const { nome, cpf, categoria_id, curso_id } = usuarioData;
@@ -66,8 +66,8 @@ class UsuarioService {
         }
     }
     validarUsuario(usuario) {
-        const curso = this.cursoRepository.verificarCurso(usuario.curso_id);
-        const categoria = this.categoriaUsuarioRepository.verificarCategoria(usuario.categoria_id);
+        const curso = this.cursoService.validarCurso(usuario.curso_id);
+        const categoria = this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
         if (categoria) {
             if (curso) {
                 return true;
@@ -77,7 +77,12 @@ class UsuarioService {
             }
         }
         else {
-            throw new Error("Categoria inválida");
+            if (!curso) {
+                throw new Error("Categoria e curso inválidos");
+            }
+            else {
+                throw new Error("Categoria inválida");
+            }
         }
     }
 }
