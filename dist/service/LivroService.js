@@ -73,6 +73,10 @@ class LivroService {
         const livro = this.livroRepository.buscarLivroIsbn(isbn);
         return livro;
     }
+    filtrarPorId(id) {
+        const livro = this.livroRepository.buscarLivroId(id);
+        return livro;
+    }
     atualizarLivro(livroData, isbn) {
         const { titulo, autor, editora, edicao, categoria } = livroData;
         if (!this.verificarSemelhantes(autor, editora, edicao)) {

@@ -76,6 +76,11 @@ export class LivroService {
         return livro;
     }
 
+    filtrarPorId(id: number){
+        const livro = this.livroRepository.buscarLivroId(id);
+        return livro;
+    }
+
     atualizarLivro(livroData: any, isbn: string) {
         const { titulo, autor, editora, edicao, categoria } = livroData;
         if (!this.verificarSemelhantes(autor, editora, edicao)) {

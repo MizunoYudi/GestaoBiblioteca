@@ -4,10 +4,10 @@ exports.EstoqueService = void 0;
 const Estoque_1 = require("../model/Estoque");
 const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
 const EstoqueRepository_1 = require("../repository/EstoqueRepository");
-const LivroRepository_1 = require("../repository/LivroRepository");
+const LivroService_1 = require("./LivroService");
 class EstoqueService {
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
-    livroRepository = LivroRepository_1.LivroRepository.getInstance();
+    livroService = new LivroService_1.LivroService();
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     cadastrarExemplar(estoqueData) {
         const { livro_id, quantidade } = estoqueData;
@@ -15,9 +15,16 @@ class EstoqueService {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
         const novoExemplar = new Estoque_1.Estoque(parseInt(livro_id), parseInt(quantidade));
-        if (this.livroRepository.buscarLivroId(livro_id)) {
-            this.estoqueRepository.inserirExemplar(novoExemplar);
-            return novoExemplar;
+        try {
+            if (this.livroService.filtrarPorId(livro_id)) {
+                this.estoqueRepository.inserirExemplar(novoExemplar);
+                return novoExemplar;
+            }
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                throw new Error("Livro não encontrado para cadastrar estoque");
+            }
         }
     }
     listarExemplares() {

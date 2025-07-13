@@ -2,10 +2,11 @@ import { Estoque } from "../model/Estoque";
 import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
+import { LivroService } from "./LivroService";
 
 export class EstoqueService {
     private estoqueRepository = EstoqueRepository.getInstance();
-    private livroRepository = LivroRepository.getInstance();
+    private livroService = new LivroService();
     private emprestimoRepository = EmprestimoRepository.getInstance();
 
     cadastrarExemplar(estoqueData: any) {
@@ -16,9 +17,15 @@ export class EstoqueService {
         }
 
         const novoExemplar = new Estoque(parseInt(livro_id), parseInt(quantidade));
-        if (this.livroRepository.buscarLivroId(livro_id)) {
-            this.estoqueRepository.inserirExemplar(novoExemplar);
-            return novoExemplar;
+        try{
+            if (this.livroService.filtrarPorId(livro_id)) {
+                this.estoqueRepository.inserirExemplar(novoExemplar);
+                return novoExemplar;
+            }
+        } catch(err: any){
+            if(err instanceof Error){
+                throw new Error("Livro não encontrado para cadastrar estoque");
+            }
         }
     }
 
