@@ -1,17 +1,23 @@
-import { Request, Response } from "express";
+import { Res, Route, Tags, Get, TsoaResponse } from "tsoa";
 import { CategoriaLivroService } from "../service/CategoriaLivroService";
+import { BasicResponseDto } from "../model/dto/BasicResponseDto";
 
-const categoriaLivroService = new CategoriaLivroService();
+@Route("catalogos/categorias-livros")
+@Tags("CategoriaLivro")
 
 export class CategoriaLivroController {
-    exibirCategoriaLivro(req: Request, res: Response) {
+    private categoriaLivroService = new CategoriaLivroService();
+
+    @Get()
+    async exibirCategoriaLivro(
+        @Res() fail: TsoaResponse<404, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const categoria_livros = categoriaLivroService.listarCategoriaLivro();
-            res.status(200).json({
-                categoria_livros
-            });
+            const categorias = await this.categoriaLivroService.listarCategoriaLivro();
+            return sucess(200, new BasicResponseDto("Categorias: ", categorias));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(404, new BasicResponseDto(`Erro ao buscar categorias: \n${e.message}`, undefined))
         }
     }
 }
