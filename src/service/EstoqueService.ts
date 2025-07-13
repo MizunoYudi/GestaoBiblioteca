@@ -1,13 +1,12 @@
 import { Estoque } from "../model/Estoque";
-import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
-import { LivroRepository } from "../repository/LivroRepository";
+import { EmprestimoService } from "./EmprestimoService";
 import { LivroService } from "./LivroService";
 
 export class EstoqueService {
     private estoqueRepository = EstoqueRepository.getInstance();
     private livroService = new LivroService();
-    private emprestimoRepository = EmprestimoRepository.getInstance();
+    private emprestimoService = new EmprestimoService();
 
     cadastrarExemplar(estoqueData: any) {
         const { livro_id, quantidade } = estoqueData;
@@ -49,18 +48,10 @@ export class EstoqueService {
     }
 
     removerExemplar(id: number) {
-        if (this.verificarEmprestimo(id)) {
+        if (this.emprestimoService.existeEstoqueAtivo(id)) {
             throw new Error("Possui emprestimos pendentes com tais exemplares");
         } else {
             this.estoqueRepository.excluirExemplar(id);
-        }
-    }
-
-    verificarEmprestimo(estoque_id: number) {
-        if (this.emprestimoRepository.buscarEstoqueEmprestimo(estoque_id)) {
-            return true;
-        } else {
-            return false;
         }
     }
 }

@@ -42,13 +42,13 @@ class EmprestimoRepository {
             return true;
         }
     }
-    buscarEstoqueEmprestimo(estoque_id) {
+    buscarEstoqueEmprestimoAtivo(estoque_id) {
         const estoque = this.emprestimoList.filter(e => e.estoque_id == estoque_id);
-        if (estoque.length == 0) {
-            return false;
+        if (estoque.filter(e => e.data_entrega == undefined).length != 0) {
+            return true;
         }
         else {
-            return true;
+            return false;
         }
     }
     registrarDevolucao(entrega, atraso, suspensao, id) {

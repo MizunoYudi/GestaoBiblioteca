@@ -46,12 +46,12 @@ export class EmprestimoRepository {
         }
     }
 
-    buscarEstoqueEmprestimo(estoque_id: number) {
+    buscarEstoqueEmprestimoAtivo(estoque_id: number) {
         const estoque = this.emprestimoList.filter(e => e.estoque_id == estoque_id);
-        if (estoque.length == 0) {
-            return false;
-        } else {
+        if (estoque.filter(e => e.data_entrega == undefined).length != 0) {
             return true;
+        } else {
+            return false;
         }
     }
 

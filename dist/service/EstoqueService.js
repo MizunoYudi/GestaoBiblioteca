@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EstoqueService = void 0;
 const Estoque_1 = require("../model/Estoque");
-const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
 const EstoqueRepository_1 = require("../repository/EstoqueRepository");
+const EmprestimoService_1 = require("./EmprestimoService");
 const LivroService_1 = require("./LivroService");
 class EstoqueService {
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
     livroService = new LivroService_1.LivroService();
-    emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
+    emprestimoService = new EmprestimoService_1.EmprestimoService();
     cadastrarExemplar(estoqueData) {
         const { livro_id, quantidade } = estoqueData;
         if (!livro_id || quantidade == undefined) {
@@ -44,19 +44,11 @@ class EstoqueService {
         return exemplar_atualizado;
     }
     removerExemplar(id) {
-        if (this.verificarEmprestimo(id)) {
+        if (this.emprestimoService.existeEstoqueAtivo(id)) {
             throw new Error("Possui emprestimos pendentes com tais exemplares");
         }
         else {
             this.estoqueRepository.excluirExemplar(id);
-        }
-    }
-    verificarEmprestimo(estoque_id) {
-        if (this.emprestimoRepository.buscarEstoqueEmprestimo(estoque_id)) {
-            return true;
-        }
-        else {
-            return false;
         }
     }
 }

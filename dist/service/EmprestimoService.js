@@ -33,6 +33,9 @@ class EmprestimoService {
         const emp_usuario = emprestimos.filter(e => e.usuario_id = usuario_id);
         return emp_usuario;
     }
+    existeEstoqueAtivo(id_estoque) {
+        return this.emprestimoRepository.buscarEstoqueEmprestimoAtivo(id_estoque);
+    }
     atualizarEmprestimo(id) {
         const emp = this.emprestimoRepository.buscarEmprestimoId(id);
         const data_entrega = new Date();

@@ -38,6 +38,10 @@ export class EmprestimoService {
         return emp_usuario;
     }
 
+    existeEstoqueAtivo(id_estoque: number){
+        return this.emprestimoRepository.buscarEstoqueEmprestimoAtivo(id_estoque);
+    }
+
     atualizarEmprestimo(id: number) {
         const emp = this.emprestimoRepository.buscarEmprestimoId(id);
         const data_entrega = new Date();
