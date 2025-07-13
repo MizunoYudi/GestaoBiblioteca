@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuarioService = void 0;
 const Usuario_1 = require("../model/Usuario");
 const CategoriaUsuarioService_1 = require("../service/CategoriaUsuarioService");
-const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
 const UsuarioRepository_1 = require("../repository/UsuarioRepository");
 const CursoService_1 = require("./CursoService");
+const EmprestimoService_1 = require("./EmprestimoService");
 class UsuarioService {
     usuarioRepository = UsuarioRepository_1.UsuarioRepository.getInstance();
     categoriaUsuarioService = new CategoriaUsuarioService_1.CategoriaUsuarioService();
     cursoService = new CursoService_1.CursoService();
-    emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
+    emprestimoService = new EmprestimoService_1.EmprestimoService();
     cadastrarUsuario(usuarioData) {
         const { nome, cpf, categoria_id, curso_id } = usuarioData;
         if (!nome || !cpf || !categoria_id || !curso_id) {
@@ -50,15 +50,16 @@ class UsuarioService {
     }
     removerUsuario(cpf) {
         const usuario = this.filtrarPorCPF(cpf);
-        if (this.verificarEmprestimo(usuario.id)) {
+        if (this.verificarEmprestimosAtivos(usuario.id)) {
             throw new Error("Usuário possui emprestimos pendentes no sistema");
         }
         else {
             this.usuarioRepository.excluirUsuario(cpf);
         }
     }
-    verificarEmprestimo(usuario_id) {
-        if (this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id)) {
+    verificarEmprestimosAtivos(usuario_id) {
+        const emprestimos = this.emprestimoService.listarEmprestimos().filter(e => e.usuario_id == usuario_id);
+        if (emprestimos.filter(e => e.data_entrega == undefined).length != 0) {
             return true;
         }
         else {

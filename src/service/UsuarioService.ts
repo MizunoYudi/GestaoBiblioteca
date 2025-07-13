@@ -1,15 +1,14 @@
 import { Usuario } from "../model/Usuario";
 import { CategoriaUsuarioService } from "../service/CategoriaUsuarioService";
-import { CursoRepository } from "../repository/CursoRepository";
-import { EmprestimoRepository } from "../repository/EmprestimoRepository";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 import { CursoService } from "./CursoService";
+import { EmprestimoService } from "./EmprestimoService";
 
 export class UsuarioService {
     private usuarioRepository = UsuarioRepository.getInstance();
     private categoriaUsuarioService = new CategoriaUsuarioService();
     private cursoService = new CursoService();
-    private emprestimoRepository = EmprestimoRepository.getInstance();
+    private emprestimoService = new EmprestimoService();
 
     cadastrarUsuario(usuarioData: any) {
         const { nome, cpf, categoria_id, curso_id } = usuarioData;
@@ -29,8 +28,8 @@ export class UsuarioService {
     }
 
     filtrarUsuarios(usuarios: Usuario[], filtro?: number, valor?: any) {
-        if(filtro !== undefined && valor !== undefined){
-            switch(filtro){
+        if (filtro !== undefined && valor !== undefined) {
+            switch (filtro) {
                 case 1:
                     const categoria = parseInt(valor);
                     usuarios = usuarios.filter(u => u.categoria_id == categoria);
@@ -56,15 +55,16 @@ export class UsuarioService {
 
     removerUsuario(cpf: string) {
         const usuario = this.filtrarPorCPF(cpf);
-        if (this.verificarEmprestimo(usuario.id)) {
+        if (this.verificarEmprestimosAtivos(usuario.id)) {
             throw new Error("Usuário possui emprestimos pendentes no sistema");
         } else {
             this.usuarioRepository.excluirUsuario(cpf);
         }
     }
 
-    verificarEmprestimo(usuario_id: number) {
-        if (this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id)) {
+    verificarEmprestimosAtivos(usuario_id: number) {
+        const emprestimos = this.emprestimoService.listarEmprestimos().filter(e => e.usuario_id == usuario_id);
+        if (emprestimos.filter(e => e.data_entrega == undefined).length != 0) {
             return true;
         } else {
             return false;
@@ -81,7 +81,7 @@ export class UsuarioService {
                 throw new Error("Curso inválido");
             }
         } else {
-            if(!curso){
+            if (!curso) {
                 throw new Error("Categoria e curso inválidos");
             } else {
                 throw new Error("Categoria inválida");
