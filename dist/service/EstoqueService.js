@@ -2,29 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EstoqueService = void 0;
 const Estoque_1 = require("../model/Estoque");
+const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
 const EstoqueRepository_1 = require("../repository/EstoqueRepository");
-const EmprestimoService_1 = require("./EmprestimoService");
-const LivroService_1 = require("./LivroService");
+const LivroRepository_1 = require("../repository/LivroRepository");
 class EstoqueService {
     estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
-    livroService = new LivroService_1.LivroService();
-    emprestimoService = new EmprestimoService_1.EmprestimoService();
+    livroRepository = LivroRepository_1.LivroRepository.getInstance();
+    emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     cadastrarExemplar(estoqueData) {
         const { livro_id, quantidade } = estoqueData;
         if (!livro_id || quantidade == undefined) {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
         const novoExemplar = new Estoque_1.Estoque(parseInt(livro_id), parseInt(quantidade));
-        try {
-            if (this.livroService.filtrarPorId(livro_id)) {
-                this.estoqueRepository.inserirExemplar(novoExemplar);
-                return novoExemplar;
-            }
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                throw new Error("Livro não encontrado para cadastrar estoque");
-            }
+        if (this.livroRepository.buscarLivroId(livro_id)) {
+            this.estoqueRepository.inserirExemplar(novoExemplar);
+            return novoExemplar;
         }
     }
     listarExemplares() {
@@ -44,11 +37,19 @@ class EstoqueService {
         return exemplar_atualizado;
     }
     removerExemplar(id) {
-        if (this.emprestimoService.existeEstoqueAtivo(id)) {
+        if (this.verificarEmprestimo(id)) {
             throw new Error("Possui emprestimos pendentes com tais exemplares");
         }
         else {
             this.estoqueRepository.excluirExemplar(id);
+        }
+    }
+    verificarEmprestimo(estoque_id) {
+        if (this.emprestimoRepository.buscarEstoqueEmprestimoAtivo(estoque_id)) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 }

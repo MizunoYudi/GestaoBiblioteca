@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { LivroService } from "../service/LivroService";
 
-const livroService = new LivroService();
+const livroService = new LivroService()
 
 export class LivroController {
     novoLivro(req: Request, res: Response) {

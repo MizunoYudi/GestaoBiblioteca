@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmprestimoService = void 0;
 const Emprestimo_1 = require("../model/Emprestimo");
 const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
-const EstoqueRepository_1 = require("../repository/EstoqueRepository");
-const LivroRepository_1 = require("../repository/LivroRepository");
 const UsuarioRepository_1 = require("../repository/UsuarioRepository");
+const EstoqueService_1 = require("./EstoqueService");
+const LivroService_1 = require("./LivroService");
 class EmprestimoService {
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
     usuarioRepository = UsuarioRepository_1.UsuarioRepository.getInstance();
-    livroRepository = LivroRepository_1.LivroRepository.getInstance();
-    estoqueRepository = EstoqueRepository_1.EstoqueRepository.getInstance();
+    livroService = new LivroService_1.LivroService();
+    estoqueService = new EstoqueService_1.EstoqueService();
     cadastrarEmprestimo(empData) {
         const { usuario_id, estoque_id } = empData;
         if (!usuario_id || !estoque_id) {
@@ -61,7 +61,7 @@ class EmprestimoService {
         }, 360000);
     }
     emprestarEstoque(estoque_id) {
-        const estoque = this.estoqueRepository.buscarPorId(estoque_id);
+        const estoque = this.estoqueService.filtrarPorId(estoque_id);
         if (estoque.quantidade_emprestada != estoque.quantidade) {
             estoque.quantidade_emprestada += 1;
             if (estoque.quantidade_emprestada == estoque.quantidade) {
@@ -70,13 +70,22 @@ class EmprestimoService {
         }
     }
     devolverEstoque(estoque_id) {
-        const estoque = this.estoqueRepository.buscarPorId(estoque_id);
+        const estoque = this.estoqueService.filtrarPorId(estoque_id);
         estoque.quantidade_emprestada -= 1;
     }
     verificarEstoque(estoque_id) {
-        const estoque = this.estoqueRepository.buscarPorId(estoque_id);
+        const estoque = this.estoqueService.filtrarPorId(estoque_id);
         if (!estoque.disponivel) {
             throw new Error(`Não há exemplares disponíveis para emprestimo. Quantidade total: ${estoque.quantidade}, Quantidade emprestada:${estoque.quantidade_emprestada}`);
+        }
+    }
+    verificarLivroEmprestimo(livro_id) {
+        const estoque = this.estoqueService.listarExemplares().findIndex(e => e.livro_id = livro_id);
+        if (estoque != -1) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
     verificarUsuarioAtivo(usuario_id) {
@@ -141,8 +150,8 @@ class EmprestimoService {
     }
     permissoesEmprestimo(usuario_id, estoque_id) {
         const usuario = this.usuarioRepository.buscarUsuarioId(usuario_id);
-        const estoque = this.estoqueRepository.buscarPorId(estoque_id);
-        const livro = this.livroRepository.buscarLivroId(estoque.livro_id);
+        const estoque = this.estoqueService.filtrarPorId(estoque_id);
+        const livro = this.livroService.filtrarPorId(estoque.livro_id);
         const disponibilidade_emp = { dias: 0, livros: 0 };
         switch (usuario.categoria_id) {
             case 1:
