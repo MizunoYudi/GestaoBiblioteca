@@ -7,7 +7,7 @@ export class CursoService {
         return this.cursoRepository.buscarCursos();
     }
 
-    validarCurso(id_curso: number){
+    validarCurso(id_curso: number): Promise<boolean>{
         return this.cursoRepository.verificarCurso(id_curso);
     }
 }

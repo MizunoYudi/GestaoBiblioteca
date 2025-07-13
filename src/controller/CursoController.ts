@@ -1,17 +1,23 @@
-import { Request, Response } from "express";
+import { Res, Route, Tags, Get, TsoaResponse } from "tsoa";
 import { CursoService } from "../service/CursoService";
+import { BasicResponseDto } from "../model/dto/BasicResponseDto";
 
-const cursoService = new CursoService();
+@Route("catalogos/cursos")
+@Tags("Cursos")
 
 export class CursoController {
-    exibirCursos(req: Request, res: Response) {
+    private cursoService = new CursoService();
+
+    @Get()
+    async exibirCursos(
+        @Res() fail: TsoaResponse<404, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const cursos = cursoService.listarCursos();
-            res.status(200).json({
-                cursos
-            });
+            const cursos = await this.cursoService.listarCursos();
+            return sucess(200, new BasicResponseDto("Categorias: ", cursos));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(404, new BasicResponseDto(`Erro ao buscar curso: \n${e.message}`, undefined))
         }
     }
 }

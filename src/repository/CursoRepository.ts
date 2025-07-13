@@ -1,28 +1,27 @@
-import { Curso } from "../model/entity/CursoEntity";
+import { executarComandoSQL } from "../database/mysql";
+import { CursoEntity } from "../model/entity/CursoEntity";
 
 export class CursoRepository {
     private static instance: CursoRepository;
-    private cursoList: Curso[] =
-        [
-            {
-                id: 1,
-                nome: "ADS"
-            },
-            {
-                id: 2,
-                nome: "Pedagogia"
-            },
-            {
-                id: 3,
-                nome: "Administração"
-            },
-            {
-                id: 4,
-                nome: "Sem curso"
-            }
-        ];
 
-    private constructor() { };
+    private constructor() {
+        this.criarTabela();
+    };
+
+    private async criarTabela(){
+        const query = `
+            CREATE TABLE IF NOT EXISTS biblioteca.Curso (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(80) NOT NULL
+            );
+        `;
+        try{
+            const resultado = await executarComandoSQL(query, []);
+            console.log('Tabela Curso criada: ', resultado);
+        } catch(err: any) {
+            console.log("Erro ao criar a tabela Curso: ", err);
+        }
+    }
 
     public static getInstance(): CursoRepository {
         if (!this.instance) {
@@ -31,16 +30,23 @@ export class CursoRepository {
         return this.instance;
     }
 
-    buscarCursos() {
-        return this.cursoList;
+    async buscarCursos() {
+        const query = `
+            select * from biblioteca.Curso;
+        `;
+        const resultado = await executarComandoSQL(query, []);
+        return resultado;
     }
 
-    verificarCurso(id: number): boolean {
-        const indice = this.cursoList.findIndex(c => c.id == id);
-        if (indice == -1) {
-            return false;
-        } else {
+    async verificarCurso(id: number): Promise<boolean> {
+        const query = `
+            select * from biblioteca.Curso where id = ?;
+        `
+        const resultado = await executarComandoSQL(query, [id]);
+        if(resultado[0] != undefined){
             return true;
+        } else {
+            return false;
         }
     }
 }
