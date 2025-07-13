@@ -1,5 +1,5 @@
-import { Emprestimo } from "../model/Emprestimo";
-import { Usuario } from "../model/Usuario";
+import { Emprestimo } from "../model/entity/EmprestimoEntity";
+import { Usuario } from "../model/entity/UsuarioEntity";
 
 export class EmprestimoRepository {
     private static instance: EmprestimoRepository;

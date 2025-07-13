@@ -1,4 +1,4 @@
-export class Curso {
+export class CursoEntity {
     id: number;
     nome: string;
 

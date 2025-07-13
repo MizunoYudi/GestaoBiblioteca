@@ -1,4 +1,4 @@
-export class CategoriaUsuario {
+export class CategoriaLivroEntity {
     id: number;
     nome: string;
 

@@ -1,4 +1,4 @@
-import { Usuario } from "../model/Usuario";
+import { Usuario } from "../model/entity/UsuarioEntity";
 import { CategoriaUsuarioService } from "../service/CategoriaUsuarioService";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 import { CursoService } from "./CursoService";

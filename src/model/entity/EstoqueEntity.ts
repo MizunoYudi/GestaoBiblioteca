@@ -1,4 +1,4 @@
-export class Estoque {
+export class EstoqueEntity {
     id: number;
     livro_id: number;
     quantidade: number;

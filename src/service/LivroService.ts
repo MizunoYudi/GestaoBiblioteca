@@ -1,4 +1,4 @@
-import { Livro } from "../model/Livro";
+import { Livro } from "../model/entity/LivroEntity";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { LivroRepository } from "../repository/LivroRepository";
 import { CategoriaLivroService } from "./CategoriaLivroService";

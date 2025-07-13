@@ -1,4 +1,4 @@
-export class Emprestimo {
+export class EmprestimoEntity {
     id: number;
     usuario_id: number;
     estoque_id: number;
