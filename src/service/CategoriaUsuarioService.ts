@@ -7,7 +7,7 @@ export class CategoriaUsuarioService {
         return this.categoriaRepository.buscarCategorias();
     }
 
-    validarCategoriaUsuario(id_categoria: number) {
+    validarCategoriaUsuario(id_categoria: number): Promise<boolean> {
         return this.categoriaRepository.verificarCategoria(id_categoria);
     }
 }

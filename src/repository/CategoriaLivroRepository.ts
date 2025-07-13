@@ -5,10 +5,10 @@ export class CategoriaLivroRepository {
     private static instance: CategoriaLivroRepository;
 
     private constructor() {
-        this.createTable();
+        this.criarTabela();
     };
 
-    private async createTable(){
+    private async criarTabela(){
         const query = `
             CREATE TABLE IF NOT EXISTS biblioteca.Categoria_Livro (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -40,7 +40,7 @@ export class CategoriaLivroRepository {
 
     async verificarCategoria(id: number): Promise<boolean> {
         const query = `
-            select * from biblioteca.Categoria_livro where id = ?
+            select * from biblioteca.Categoria_livro where id = ?;
         `
         const resultado = await executarComandoSQL(query, [id]);
         if(resultado[0] != undefined){

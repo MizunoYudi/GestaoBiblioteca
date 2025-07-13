@@ -1,17 +1,23 @@
-import { Request, Response } from "express";
+import { Res, Route, Tags, Get, TsoaResponse } from "tsoa";
 import { CategoriaUsuarioService } from "../service/CategoriaUsuarioService";
+import { BasicResponseDto } from "../model/dto/BasicResponseDto";
 
-const categoriaUsuarioService = new CategoriaUsuarioService();
+@Route("catalogos/categorias-usuarios")
+@Tags("CategoriaUsuario")
 
 export class CategoriaUsuarioController {
-    exibirCategoriaUsuario(req: Request, res: Response) {
+    private categoriaUsuarioService = new CategoriaUsuarioService();
+
+    @Get()
+    async exibirCategoriaUsuario(
+        @Res() fail: TsoaResponse<404, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const categoria_usuarios = categoriaUsuarioService.listarCategoriaUsuario();
-            res.status(200).json({
-                categoria_usuarios
-            });
+            const categorias = await this.categoriaUsuarioService.listarCategoriaUsuario();
+            return sucess(200, new BasicResponseDto("Categorias: ", categorias));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(404, new BasicResponseDto(`Erro ao buscar categorias: \n${e.message}`, undefined))
         }
     }
 }
