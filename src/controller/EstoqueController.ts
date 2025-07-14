@@ -1,73 +1,84 @@
-import { Request, Response } from "express";
+import { Post, Res, Route, Tags, Get, TsoaResponse, Body, Path, Query, Put, Delete } from "tsoa";
+import { BasicResponseDto } from "../model/dto/BasicResponseDto";
 import { EstoqueService } from "../service/EstoqueService";
+import { EstoqueDto } from "../model/dto/EstoqueDto";
 
-const estoqueService = new EstoqueService();
+@Route("estoque")
+@Tags("Estoque")
 
 export class EstoqueController {
-    novoExemplar(req: Request, res: Response) {
+    private estoqueService = new EstoqueService();
+
+    @Post()
+    async novoExemplar(
+        @Body() dto: EstoqueDto,
+        @Res() fail: TsoaResponse<400, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<201, BasicResponseDto>
+    ) {
         try {
-            const novoExemplar = estoqueService.cadastrarExemplar(req.body);
-            res.status(201).json({
-                mensagem: "Exemplar cadastrado!",
-                Exemplar: novoExemplar
-            });
+            const novoExemplar = await this.estoqueService.cadastrarExemplar(dto);
+            return sucess(201, new BasicResponseDto("Estoque criado: ", novoExemplar));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(400, new BasicResponseDto(`Erro ao criar o estoque: \n${e.message}`, undefined));
         }
     }
 
-    exibirExemplares(req: Request, res: Response) {
+    @Get()
+    async exibirExemplares(
+        @Res() fail: TsoaResponse<400, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const exemplares = estoqueService.listarExemplares();
-            res.status(200).json({
-                exemplares
-            });
+            const exemplares = await this.estoqueService.listarExemplares();
+            return sucess(200, new BasicResponseDto("Exemplares: ", exemplares));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(400, new BasicResponseDto(`Erro ao buscar exemplares: \n${e.message}`, undefined));
         }
     }
 
-    filtrarExemplarPorId(req: Request, res: Response) {
+    @Get("{id}")
+    async filtrarExemplarPorId(
+        @Path() id: number,
+        @Res() fail: TsoaResponse<400, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const id = parseInt(req.params.id);
-            const exemplar = estoqueService.filtrarPorId(id);
-            res.status(200).json({
-                mensagem: "Exemplar encontrado!",
-                exemplar: exemplar
-            });
+            const exemplar = await this.estoqueService.filtrarPorId(id);
+            return sucess(200, new BasicResponseDto("Exemplar encontrado: ", exemplar));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(400, new BasicResponseDto(`Erro ao criar o estoque: \n${e.message}`, undefined));
         }
     }
 
-    atualizarDiponibilidade(req: Request, res: Response) {
+    @Put("{id}")
+    async atualizarDiponibilidade(
+        @Body() dto: any,
+        @Path() id: number,
+        @Res() fail: TsoaResponse<400, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const id = parseInt(req.params.id);
-            const exemplar = estoqueService.atualizarDisponibilidade(req.body.disponivel, id);
-            if (typeof req.body.disponivel == 'undefined') {
-                res.status(401).json({
-                    Status: "Error",
-                    mensagem: "Insira a disponibilidade para poder altera-la"
-                });
+            const exemplar = await this.estoqueService.atualizarDisponibilidade(dto, id);
+            if (typeof dto == 'undefined') {
+                return fail(400, new BasicResponseDto(`Insira a disponibilidade para poder altera-la`, undefined));
             }
-            res.status(200).json({
-                mensagem: "Disponivilidade do exemplar atualizada com sucesso!",
-                exemplar: exemplar
-            });
+            return sucess(200, new BasicResponseDto("Disponibilidade do exemplar atualizada com sucesso!", exemplar));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(400, new BasicResponseDto(`Erro ao alterar a disponibilidade do estoque: \n${e.message}`, undefined));
         }
     }
 
-    apagarExemplar(req: Request, res: Response) {
+    @Delete("{id}")
+    async apagarExemplar(
+        @Path() id: number,
+        @Res() fail: TsoaResponse<400, BasicResponseDto>,
+        @Res() sucess: TsoaResponse<200, BasicResponseDto>
+    ) {
         try {
-            const id = parseInt(req.params.id);
-            estoqueService.removerExemplar(id);
-            res.status(200).json({
-                mensagem: "Exemplar removido com sucesso!"
-            });
+            await this.estoqueService.removerExemplar(id);
+            return sucess(200, new BasicResponseDto("Exemplar removido", undefined));
         } catch (e: any) {
-            res.status(400).json({ Status: "Error", mensagem: e.message });
+            return fail(400, new BasicResponseDto(`Erro ao remover o estoque: \n${e.message}`, undefined));
         }
     }
 }

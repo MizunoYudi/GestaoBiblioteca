@@ -8,9 +8,9 @@ export class EstoqueDto {
     constructor(
         livro_id?: number,
         quantidade?: number,
-        quantidade_emprestada?: number,
+        id?: number,
         disponivel?: boolean,
-        id?: number
+        quantidade_emprestada?: number
     ) {
         this.livro_id = livro_id || 0;
         this.quantidade = quantidade || 0;

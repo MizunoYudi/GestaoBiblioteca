@@ -24,8 +24,8 @@ export class UsuarioRepository {
                     nome VARCHAR(80) NOT NULL,
                     cpf VARCHAR(11) NOT NULL,
                     status VARCHAR(20) NOT NULL,
-                    categoria_id int(10) NOT NULL,
-                    curso_id(10) NOT NULL,
+                    categoria_id int NOT NULL,
+                    curso_id int NOT NULL,
                     foreign key(categoria_id) references biblioteca.categoria_usuario(id),
                     foreign key(curso_id) references biblioteca.curso(id),
                     unique(cpf)
@@ -101,10 +101,10 @@ export class UsuarioRepository {
             delete from biblioteca.Usuario where cpf = ?
         `
         const resultado = await executarComandoSQL(query, [cpf]);
-        console.log("Livro excluido com sucesso: ", resultado);
+        console.log("Usuario excluido com sucesso: ", resultado);
     }
 
-    async buscarEmprestimosAtivos(usuario_id: number) {
+    async existeEmprestimosAtivos(usuario_id: number) {
         const query = `
             select * from bilbioteca.Emprestimo where usuario_id = ? and data_entrega is null
         `;

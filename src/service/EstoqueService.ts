@@ -1,4 +1,4 @@
-import { Estoque } from "../model/entity/EstoqueEntity";
+import { EstoqueEntity } from "../model/entity/EstoqueEntity";
 import { EstoqueRepository } from "../repository/EstoqueRepository";
 import { EmprestimoService } from "./EmprestimoService";
 import { LivroService } from "./LivroService";
@@ -8,17 +8,17 @@ export class EstoqueService {
     private livroService = new LivroService();
     private emprestimoService = new EmprestimoService();
 
-    cadastrarExemplar(estoqueData: any) {
+    async cadastrarExemplar(estoqueData: any) {
         const { livro_id, quantidade } = estoqueData;
 
         if (!livro_id|| quantidade == undefined) {
             throw new Error("Informações incompletas para o cadastro do exemplar");
         }
 
-        const novoExemplar = new Estoque(parseInt(livro_id), parseInt(quantidade));
+        const novoExemplar = new EstoqueEntity(parseInt(livro_id), parseInt(quantidade));
         try{
-            if (this.livroService.filtrarPorId(livro_id)) {
-                this.estoqueRepository.inserirExemplar(novoExemplar);
+            if (await this.livroService.filtrarPorId(livro_id)) {
+                await this.estoqueRepository.inserirExemplar(novoExemplar);
                 return novoExemplar;
             }
         } catch(err: any){
@@ -28,30 +28,28 @@ export class EstoqueService {
         }
     }
 
-    listarExemplares() {
-        const exemplares = this.estoqueRepository.buscarExemplares();
-        return exemplares.filter(e => e.disponivel == true);
+    async listarExemplares() {
+        return await this.estoqueRepository.buscarExemplares();
     }
 
-    filtrarPorId(id: number): Estoque {
-        const exemplar = this.estoqueRepository.buscarPorId(id);
+    async filtrarPorId(id: number): Promise<EstoqueEntity> {
+        const exemplar = await this.estoqueRepository.buscarPorId(id);
         return exemplar;
     }
 
-    atualizarDisponibilidade(disponivel: boolean, id: number) {
-        const exmp = this.estoqueRepository.buscarPorId(id);
+    async atualizarDisponibilidade(disponivel: boolean, id: number) {
+        const exmp = await this.estoqueRepository.buscarPorId(id);
         if(exmp.quantidade == exmp.quantidade_emprestada){
             throw new Error(`Não é possível atualizar a disponibilidade do estoque: quantidade de exemplares emprestados exedidos. Quantidade total: ${exmp.quantidade}, Quantidade emprestada: ${exmp.quantidade_emprestada}`)
         }
-        const exemplar_atualizado = this.estoqueRepository.alterarExemplar(disponivel, id);
-        return exemplar_atualizado;
+        return await this.estoqueRepository.alterarExemplar(disponivel, id);;
     }
 
-    removerExemplar(id: number) {
-        if (this.emprestimoService.existeEstoqueAtivo(id)) {
+    async removerExemplar(id: number) {
+        if (await this.estoqueRepository.existeEmprestimosAtivos(id)) {
             throw new Error("Possui emprestimos pendentes com tais exemplares");
         } else {
-            this.estoqueRepository.excluirExemplar(id);
+            await this.estoqueRepository.excluirExemplar(id);
         }
     }
 }

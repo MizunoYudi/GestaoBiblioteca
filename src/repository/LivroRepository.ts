@@ -19,7 +19,7 @@ export class LivroRepository {
                 edicao VARCHAR(80) NOT NULL,
                 editora VARHCAR(80) NOT NULL,
                 isbn VARCHAR(30) NOT NULL,
-                categoria_id INT(10) NOT NULL,
+                categoria_id INT NOT NULL,
                 foreign key (categoria_id) references biblioteca.Categoria_livro(id),
                 unique(isbn),
                 unique(autor),

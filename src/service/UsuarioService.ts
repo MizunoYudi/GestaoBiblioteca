@@ -56,12 +56,12 @@ export class UsuarioService {
         if (await this.verificarEmprestimosAtivos(usuario.id)) {
             throw new Error("Usuário possui emprestimos pendentes no sistema");
         } else {
-            this.usuarioRepository.excluirUsuario(cpf);
+            await this.usuarioRepository.excluirUsuario(cpf);
         }
     }
 
     async verificarEmprestimosAtivos(usuario_id: number) {
-        return await this.usuarioRepository.buscarEmprestimosAtivos(usuario_id);
+        return await this.usuarioRepository.existeEmprestimosAtivos(usuario_id);
     }
 
     async validarUsuario(usuario: UsuarioEntity): Promise<boolean> {
