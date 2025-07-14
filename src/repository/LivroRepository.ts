@@ -85,7 +85,7 @@ export class LivroRepository {
 
     async alterarLivro(titulo: string, autor: string, editora: string, edicao: string, categoria_id: number, isbn: string){
         const query = `
-            update from bilbioteca.Livro 
+            update bilbioteca.Livro 
                 set titulo = ?,
                 set autor = ?,
                 set editora = ?,

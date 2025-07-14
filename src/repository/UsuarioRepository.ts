@@ -42,7 +42,7 @@ export class UsuarioRepository {
 
     async inserirUsuario(usuario: UsuarioEntity) {
         const query = `
-            insert into bilbioteca.Livro(titulo, autor, edicao, editora, isbn, categoria_id)
+            insert into bilbioteca.Usuario(titulo, autor, edicao, editora, isbn, categoria_id)
                 values(?, ?, ?, ?, ?, ?);
         `;
         const resultado = await executarComandoSQL(query, [usuario.nome, usuario.cpf, usuario.status, usuario.categoria_id, usuario.curso_id]);
@@ -83,7 +83,7 @@ export class UsuarioRepository {
 
     async alterarUsuario(nome: string, status: string, categoria_id: number, curso_id: number, cpf: string): Promise<UsuarioEntity> {
         const query = `
-                    update from bilbioteca.Usuario
+                    update bilbioteca.Usuario
                         set nome = ?,
                         set status = ?,
                         set categoria_id = ?,
@@ -92,7 +92,7 @@ export class UsuarioRepository {
                     where cpf = ?
                 `
         await executarComandoSQL(query, [nome, status, categoria_id, curso_id, categoria_id, cpf])
-        const usuario = this.buscarUsuarioCPF(cpf);
+        const usuario = await this.buscarUsuarioCPF(cpf);
         return usuario;
     }
 

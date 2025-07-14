@@ -74,7 +74,7 @@ export class EstoqueRepository {
 
     async buscarPorId(id: number) {
         const query = `
-            select * from estoque where id = ?
+            select * from biblioteca.estoque where id = ?
         `
         const resultado = await executarComandoSQL(query, [id]);
         if(resultado[0] != undefined){
@@ -87,7 +87,7 @@ export class EstoqueRepository {
 
     async alterarExemplar(disponivel: boolean, id: number) {
         const query = `
-            update from biblioteca.Estoque
+            update biblioteca.Estoque
                 set disponivel = ?
             where id = ?
         `;
