@@ -16,7 +16,7 @@ export class LivroService {
 
         const novoLivro = new LivroEntity(titulo, autor, editora, edicao, isbn, parseInt(categoria_id));
         if (await this.validarLivro(autor, editora, edicao, categoria_id)) {
-            return this.livroRepository.inserirLivro(titulo, autor, editora, edicao, isbn, categoria_id); 
+            return await this.livroRepository.inserirLivro(novoLivro); 
         }
     }
 

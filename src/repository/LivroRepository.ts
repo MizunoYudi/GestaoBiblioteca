@@ -19,7 +19,7 @@ export class LivroRepository {
                 edicao VARCHAR(80) NOT NULL,
                 editora VARHCAR(80) NOT NULL,
                 isbn VARCHAR(30) NOT NULL,
-                categoria_id INT(40) NOT NULL,
+                categoria_id INT(10) NOT NULL,
                 foreign key (categoria_id) references biblioteca.Categoria_livro(id),
                 unique(isbn),
                 unique(autor),
@@ -42,14 +42,14 @@ export class LivroRepository {
         return this.instance
     }
 
-    async inserirLivro(titulo: string, autor: string, editora: string, edicao: string, isbn: string, categoria_id: number) {
+    async inserirLivro(livro: LivroEntity) {
         const query = `
             insert into bilbioteca.Livro(titulo, autor, edicao, editora, isbn, categoria_id)
                 values(?, ?, ?, ?, ?, ?);
         `;
-        const resultado = await executarComandoSQL(query, [titulo, autor, edicao, editora, isbn, categoria_id]);
+        const resultado = await executarComandoSQL(query, [livro.titulo, livro.autor, livro.edicao, livro.editora, livro.isbn, livro.categoria_id]);
         console.log("Livro inserido com sucesso: ", resultado);
-        return new LivroEntity(titulo, autor, editora, edicao, isbn, categoria_id, resultado.insertId);
+        return new LivroEntity(livro.titulo, livro.autor, livro.editora, livro.edicao, livro.isbn, livro.categoria_id, resultado.insertId);
     }
 
     async buscarLivros() {
@@ -129,6 +129,5 @@ export class LivroRepository {
         } else {
             return false;
         }
-        
     }
 }

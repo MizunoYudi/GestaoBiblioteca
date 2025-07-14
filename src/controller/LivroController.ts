@@ -17,7 +17,7 @@ export class LivroController {
     ) {
         try {
             const livro = await this.livroService.cadastrarLivro(dto);
-            return sucess(201, new BasicResponseDto("Livro criado: ", livro))
+            return sucess(201, new BasicResponseDto("Livro criado: ", livro));
         } catch (e: any) {
             return fail(400, new BasicResponseDto(`Erro ao criar o Livro: \n${e.message}`, undefined))
         }

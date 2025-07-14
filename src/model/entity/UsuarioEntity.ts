@@ -2,7 +2,7 @@ export class UsuarioEntity {
     id: number;
     nome: string;
     cpf: string;
-    ativo: string;
+    status: string;
     categoria_id: number;
     curso_id: number;
 
@@ -12,7 +12,7 @@ export class UsuarioEntity {
         categoria_id: number,
         curso_id: number,
         id?: number,
-        ativo?: string
+        status?: string
     ) {
         if(!this.validarCPF(cpf)){
             throw new Error("CPF invalido");
@@ -22,7 +22,7 @@ export class UsuarioEntity {
         this.categoria_id = categoria_id;
         this.curso_id = curso_id;
         this.id = id || 0;
-        this.ativo = ativo || 'ativo';
+        this.status = status || 'status';
     }
 
     private validarCPF(cpf: string): boolean {

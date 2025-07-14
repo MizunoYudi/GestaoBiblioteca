@@ -1,4 +1,4 @@
-import { Usuario } from "../model/entity/UsuarioEntity";
+import { UsuarioEntity } from "../model/entity/UsuarioEntity";
 import { CategoriaUsuarioService } from "../service/CategoriaUsuarioService";
 import { UsuarioRepository } from "../repository/UsuarioRepository";
 import { CursoService } from "./CursoService";
@@ -8,26 +8,24 @@ export class UsuarioService {
     private usuarioRepository = UsuarioRepository.getInstance();
     private categoriaUsuarioService = new CategoriaUsuarioService();
     private cursoService = new CursoService();
-    private emprestimoService = new EmprestimoService();
 
-    cadastrarUsuario(usuarioData: any) {
+    async cadastrarUsuario(usuarioData: any) {
         const { nome, cpf, categoria_id, curso_id } = usuarioData;
         if (!nome || !cpf || !categoria_id || !curso_id) {
             throw new Error("Informações incompletas para o cadastro do usuário");
         }
 
-        const novoUsuario = new Usuario(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
-        if (this.validarUsuario(novoUsuario)) {
-            this.usuarioRepository.inserirUsuario(novoUsuario);
-            return novoUsuario;
+        const novoUsuario = new UsuarioEntity(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
+        if (await this.validarUsuario(novoUsuario)) {
+            return await this.usuarioRepository.inserirUsuario(novoUsuario);
         }
     }
 
-    listarUsuarios(): Usuario[] {
-        return this.usuarioRepository.buscarUsuarios();
+    async listarUsuarios(): Promise<UsuarioEntity[]> {
+        return await this.usuarioRepository.buscarUsuarios();
     }
 
-    filtrarUsuarios(usuarios: Usuario[], filtro?: number, valor?: any) {
+    filtrarUsuarios(usuarios:UsuarioEntity[], filtro?: number, valor?: any) {
         if (filtro !== undefined && valor !== undefined) {
             switch (filtro) {
                 case 1:
@@ -43,37 +41,32 @@ export class UsuarioService {
         return usuarios;
     }
 
-    filtrarPorCPF(cpf: string) {
-        const usuario = this.usuarioRepository.buscarUsuarioCPF(cpf);
+    async filtrarPorCPF(cpf: string) {
+        const usuario = await this.usuarioRepository.buscarUsuarioCPF(cpf);
         return usuario;
     }
 
-    atualizarUsuario(usuarioData: any, cpf: string): Usuario {
+    async atualizarUsuario(usuarioData: any, cpf: string): Promise<UsuarioEntity> {
         const { nome, ativo, categoria_id, curso_id } = usuarioData;
-        return this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
+        return await this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
     }
 
-    removerUsuario(cpf: string) {
-        const usuario = this.filtrarPorCPF(cpf);
-        if (this.verificarEmprestimosAtivos(usuario.id)) {
+    async removerUsuario(cpf: string) {
+        const usuario = await this.filtrarPorCPF(cpf);
+        if (await this.verificarEmprestimosAtivos(usuario.id)) {
             throw new Error("Usuário possui emprestimos pendentes no sistema");
         } else {
             this.usuarioRepository.excluirUsuario(cpf);
         }
     }
 
-    verificarEmprestimosAtivos(usuario_id: number) {
-        const emprestimos = this.emprestimoService.listarEmprestimos().filter(e => e.usuario_id == usuario_id);
-        if (emprestimos.filter(e => e.data_entrega == undefined).length != 0) {
-            return true;
-        } else {
-            return false;
-        }
+    async verificarEmprestimosAtivos(usuario_id: number) {
+        return await this.usuarioRepository.buscarEmprestimosAtivos(usuario_id);
     }
 
-    validarUsuario(usuario: Usuario): boolean {
-        const curso = this.cursoService.validarCurso(usuario.curso_id);
-        const categoria = this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
+    async validarUsuario(usuario: UsuarioEntity): Promise<boolean> {
+        const curso = await this.cursoService.validarCurso(usuario.curso_id);
+        const categoria = await this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
         if (categoria) {
             if (curso) {
                 return true;
