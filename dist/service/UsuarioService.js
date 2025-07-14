@@ -1,29 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuarioService = void 0;
-const Usuario_1 = require("../model/Usuario");
+const UsuarioEntity_1 = require("../model/entity/UsuarioEntity");
 const CategoriaUsuarioService_1 = require("../service/CategoriaUsuarioService");
 const UsuarioRepository_1 = require("../repository/UsuarioRepository");
 const CursoService_1 = require("./CursoService");
-const EmprestimoService_1 = require("./EmprestimoService");
 class UsuarioService {
     usuarioRepository = UsuarioRepository_1.UsuarioRepository.getInstance();
     categoriaUsuarioService = new CategoriaUsuarioService_1.CategoriaUsuarioService();
     cursoService = new CursoService_1.CursoService();
-    emprestimoService = new EmprestimoService_1.EmprestimoService();
-    cadastrarUsuario(usuarioData) {
+    async cadastrarUsuario(usuarioData) {
         const { nome, cpf, categoria_id, curso_id } = usuarioData;
         if (!nome || !cpf || !categoria_id || !curso_id) {
             throw new Error("Informações incompletas para o cadastro do usuário");
         }
-        const novoUsuario = new Usuario_1.Usuario(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
-        if (this.validarUsuario(novoUsuario)) {
-            this.usuarioRepository.inserirUsuario(novoUsuario);
-            return novoUsuario;
+        const novoUsuario = new UsuarioEntity_1.UsuarioEntity(nome, cpf, parseInt(categoria_id), parseInt(curso_id));
+        if (await this.validarUsuario(novoUsuario)) {
+            return await this.usuarioRepository.inserirUsuario(novoUsuario);
         }
     }
-    listarUsuarios() {
-        return this.usuarioRepository.buscarUsuarios();
+    async listarUsuarios() {
+        return await this.usuarioRepository.buscarUsuarios();
     }
     filtrarUsuarios(usuarios, filtro, valor) {
         if (filtro !== undefined && valor !== undefined) {
@@ -40,35 +37,29 @@ class UsuarioService {
         }
         return usuarios;
     }
-    filtrarPorCPF(cpf) {
-        const usuario = this.usuarioRepository.buscarUsuarioCPF(cpf);
+    async filtrarPorCPF(cpf) {
+        const usuario = await this.usuarioRepository.buscarUsuarioCPF(cpf);
         return usuario;
     }
-    atualizarUsuario(usuarioData, cpf) {
+    async atualizarUsuario(usuarioData, cpf) {
         const { nome, ativo, categoria_id, curso_id } = usuarioData;
-        return this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
+        return await this.usuarioRepository.alterarUsuario(nome, ativo, categoria_id, curso_id, cpf);
     }
-    removerUsuario(cpf) {
-        const usuario = this.filtrarPorCPF(cpf);
-        if (this.verificarEmprestimosAtivos(usuario.id)) {
+    async removerUsuario(cpf) {
+        const usuario = await this.filtrarPorCPF(cpf);
+        if (await this.verificarEmprestimosAtivos(usuario.id)) {
             throw new Error("Usuário possui emprestimos pendentes no sistema");
         }
         else {
-            this.usuarioRepository.excluirUsuario(cpf);
+            await this.usuarioRepository.excluirUsuario(cpf);
         }
     }
-    verificarEmprestimosAtivos(usuario_id) {
-        const emprestimos = this.emprestimoService.listarEmprestimos().filter(e => e.usuario_id == usuario_id);
-        if (emprestimos.filter(e => e.data_entrega == undefined).length != 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    async verificarEmprestimosAtivos(usuario_id) {
+        return await this.usuarioRepository.existeEmprestimosAtivos(usuario_id);
     }
-    validarUsuario(usuario) {
-        const curso = this.cursoService.validarCurso(usuario.curso_id);
-        const categoria = this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
+    async validarUsuario(usuario) {
+        const curso = await this.cursoService.validarCurso(usuario.curso_id);
+        const categoria = await this.categoriaUsuarioService.validarCategoriaUsuario(usuario.categoria_id);
         if (categoria) {
             if (curso) {
                 return true;

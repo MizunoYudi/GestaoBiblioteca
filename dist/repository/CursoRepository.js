@@ -1,44 +1,51 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CursoRepository = void 0;
+const mysql_1 = require("../database/mysql");
 class CursoRepository {
     static instance;
-    cursoList = [
-        {
-            id: 1,
-            nome: "ADS"
-        },
-        {
-            id: 2,
-            nome: "Pedagogia"
-        },
-        {
-            id: 3,
-            nome: "Administração"
-        },
-        {
-            id: 4,
-            nome: "Sem curso"
-        }
-    ];
-    constructor() { }
+    constructor() {
+        this.criarTabela();
+    }
     ;
+    async criarTabela() {
+        const query = `
+            CREATE TABLE IF NOT EXISTS biblioteca.Curso (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(80) NOT NULL
+            );
+        `;
+        try {
+            const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+            console.log('Tabela Curso criada: ', resultado);
+        }
+        catch (err) {
+            console.log("Erro ao criar a tabela Curso: ", err);
+        }
+    }
     static getInstance() {
         if (!this.instance) {
             this.instance = new CursoRepository();
         }
         return this.instance;
     }
-    buscarCursos() {
-        return this.cursoList;
+    async buscarCursos() {
+        const query = `
+            select * from biblioteca.Curso;
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+        return resultado;
     }
-    verificarCurso(id) {
-        const indice = this.cursoList.findIndex(c => c.id == id);
-        if (indice == -1) {
-            return false;
+    async verificarCurso(id) {
+        const query = `
+            select * from biblioteca.Curso where id = ?;
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [id]);
+        if (resultado[0] != undefined) {
+            return true;
         }
         else {
-            return true;
+            return false;
         }
     }
 }

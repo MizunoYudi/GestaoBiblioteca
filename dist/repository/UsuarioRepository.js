@@ -1,59 +1,110 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuarioRepository = void 0;
+const mysql_1 = require("../database/mysql");
+const UsuarioEntity_1 = require("../model/entity/UsuarioEntity");
 class UsuarioRepository {
     static instance;
-    usuarioList = [];
-    cont = 1;
     static getInstance() {
         if (!this.instance) {
             this.instance = new UsuarioRepository();
         }
         return this.instance;
     }
-    inserirUsuario(usuario) {
-        usuario.id = this.cont++;
-        const cpf = this.usuarioList.map(u => u.cpf).indexOf(usuario.cpf);
-        const id = this.usuarioList.map(u => u.id).indexOf(usuario.id);
-        if (cpf == -1 && id == -1) {
-            this.usuarioList.push(usuario);
+    constructor() {
+        this.criarTabela();
+    }
+    async criarTabela() {
+        const query = `
+                CREATE TABLE IF NOT EXISTS biblioteca.Usuario (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    nome VARCHAR(80) NOT NULL,
+                    cpf VARCHAR(11) NOT NULL,
+                    status VARCHAR(20) NOT NULL,
+                    categoria_id int NOT NULL,
+                    curso_id int NOT NULL,
+                    foreign key(categoria_id) references biblioteca.categoria_usuario(id),
+                    foreign key(curso_id) references biblioteca.curso(id),
+                    unique(cpf)
+                );
+            `;
+        try {
+            const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+            console.log('Tabela Usuario criada: ', resultado);
         }
-        else {
-            throw new Error("Já existe um usuário com o mesmo cpf ou id no sistema");
+        catch (err) {
+            console.log("Erro ao criar a tabela Usuario: ", err);
         }
     }
-    buscarUsuarios() {
-        return this.usuarioList;
+    async inserirUsuario(usuario) {
+        const query = `
+            insert into biblioteca.Usuario(titulo, autor, edicao, editora, isbn, categoria_id)
+                values(?, ?, ?, ?, ?, ?);
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [usuario.nome, usuario.cpf, usuario.status, usuario.categoria_id, usuario.curso_id]);
+        console.log("Usuario inserido com sucesso: ", resultado);
+        return new UsuarioEntity_1.UsuarioEntity(usuario.nome, usuario.cpf, usuario.categoria_id, usuario.curso_id, resultado.insertId, usuario.status);
     }
-    buscarUsuarioCPF(cpf) {
-        const indice = this.usuarioList.findIndex(u => u.cpf == cpf);
-        if (indice == -1) {
-            throw new Error("Usuário não encontrado");
+    async buscarUsuarios() {
+        const query = `
+            select * from biblioteca.usuario
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+        const usuarios = [];
+        for (let i = 0; i < resultado.length; i++) {
+            const { nome, cpf, categoria_id, curso_id, id, status } = resultado[i];
+            usuarios.push(new UsuarioEntity_1.UsuarioEntity(nome, cpf, categoria_id, curso_id, id, status));
         }
-        else {
-            return this.usuarioList[indice];
-        }
+        return usuarios;
     }
-    buscarUsuarioId(id) {
-        const indice = this.usuarioList.findIndex(u => u.id == id);
-        if (indice == -1) {
-            throw new Error("Usuário não encontrado");
-        }
-        else {
-            return this.usuarioList[indice];
-        }
+    async buscarUsuarioCPF(cpf) {
+        const query = `
+            select * from biblioteca.usuario where cpf = ?
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [cpf]);
+        const { nome, categoria_id, curso_id, id, status } = resultado[0];
+        return new UsuarioEntity_1.UsuarioEntity(nome, cpf, categoria_id, curso_id, id, status);
     }
-    alterarUsuario(nome, ativo, categoria_id, curso_id, cpf) {
-        const usuario = this.buscarUsuarioCPF(cpf);
-        nome ? usuario.nome = nome : usuario.nome = usuario.nome;
-        ativo ? usuario.ativo = ativo : usuario.ativo = usuario.ativo;
-        categoria_id ? usuario.categoria_id = categoria_id : usuario.categoria_id = usuario.categoria_id;
-        curso_id ? usuario.curso_id = curso_id : usuario.curso_id = usuario.curso_id;
+    async buscarUsuarioId(id) {
+        const query = `
+            select * from biblioteca.usuario where id = ?
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [id]);
+        const { nome, categoria_id, curso_id, cpf, status } = resultado[0];
+        return new UsuarioEntity_1.UsuarioEntity(nome, cpf, categoria_id, curso_id, id, status);
+    }
+    async alterarUsuario(nome, status, categoria_id, curso_id, cpf) {
+        const query = `
+                    update biblioteca.Usuario
+                        set nome = ?,
+                        set status = ?,
+                        set categoria_id = ?,
+                        set curso_id = ?,
+                        set categoria_id = ?
+                    where cpf = ?
+                `;
+        await (0, mysql_1.executarComandoSQL)(query, [nome, status, categoria_id, curso_id, categoria_id, cpf]);
+        const usuario = await this.buscarUsuarioCPF(cpf);
         return usuario;
     }
-    excluirUsuario(cpf) {
-        const indice = this.usuarioList.findIndex(u => u.cpf == cpf);
-        this.usuarioList.splice(indice);
+    async excluirUsuario(cpf) {
+        const query = `
+            delete from biblioteca.Usuario where cpf = ?
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [cpf]);
+        console.log("Usuario excluido com sucesso: ", resultado);
+    }
+    async existeEmprestimosAtivos(usuario_id) {
+        const query = `
+            select * from biblioteca.Emprestimo where usuario_id = ? and data_entrega is null
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [usuario_id]);
+        if (resultado[0] != undefined) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 exports.UsuarioRepository = UsuarioRepository;

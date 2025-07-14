@@ -1,10 +1,8 @@
 import { executarComandoSQL } from "../database/mysql";
 import { LivroEntity } from "../model/entity/LivroEntity";
-import { EstoqueRepository } from "./EstoqueRepository";
 
 export class LivroRepository {
     private static instance: LivroRepository;
-    private estoqueRepository = EstoqueRepository.getInstance();
 
     private constructor() { 
         this.criarTabela();
@@ -17,7 +15,7 @@ export class LivroRepository {
                 titulo VARCHAR(80) NOT NULL,
                 autor VARCHAR(80) NOT NULL,
                 edicao VARCHAR(80) NOT NULL,
-                editora VARHCAR(80) NOT NULL,
+                editora VARCHAR(80) NOT NULL,
                 isbn VARCHAR(30) NOT NULL,
                 categoria_id INT NOT NULL,
                 foreign key (categoria_id) references biblioteca.Categoria_livro(id),
@@ -44,7 +42,7 @@ export class LivroRepository {
 
     async inserirLivro(livro: LivroEntity) {
         const query = `
-            insert into bilbioteca.Livro(titulo, autor, edicao, editora, isbn, categoria_id)
+            insert into biblioteca.Livro(titulo, autor, edicao, editora, isbn, categoria_id)
                 values(?, ?, ?, ?, ?, ?);
         `;
         const resultado = await executarComandoSQL(query, [livro.titulo, livro.autor, livro.edicao, livro.editora, livro.isbn, livro.categoria_id]);
@@ -76,7 +74,7 @@ export class LivroRepository {
 
     async buscarLivroId(id: number) {
         const query = `
-            select * from bilbioteca.livro where id = ?
+            select * from biblioteca.livro where id = ?
         `
         const resultado: any[] = await executarComandoSQL(query, [id]);
         const {titulo, autor, editora, edicao, isbn, categoria_id} = resultado[0];
@@ -85,7 +83,7 @@ export class LivroRepository {
 
     async alterarLivro(titulo: string, autor: string, editora: string, edicao: string, categoria_id: number, isbn: string){
         const query = `
-            update bilbioteca.Livro 
+            update biblioteca.Livro 
                 set titulo = ?,
                 set autor = ?,
                 set editora = ?,
@@ -100,7 +98,7 @@ export class LivroRepository {
 
     async existeSemelhante(autor: string, editora: string, edicao: string){
         const query = `
-            select * from bilbioteca.livro
+            select * from biblioteca.livro
             where autor = ? and editora = ? and edicao = ?
         `
         const resultado = await executarComandoSQL(query, [autor, editora, edicao]);

@@ -45,7 +45,7 @@ export class EmprestimoRepository {
 
     async inserirEmprestimo(emprestimo: EmprestimoEntity) {
         const query = `
-            insert into bilbioteca.Emprestimo(usuario_id, estoque_id, data_emprestimo, data_devolucao)
+            insert into biblioteca.Emprestimo(usuario_id, estoque_id, data_emprestimo, data_devolucao)
                 values(?, ?, ?, ?, ?, ?);
         `;
         const resultado = await executarComandoSQL(query, [emprestimo.usuario_id, emprestimo.estoque_id, emprestimo.data_emprestimo, emprestimo.data_devolucao]);
@@ -68,7 +68,7 @@ export class EmprestimoRepository {
 
     async buscarEmprestimoId(id: number) {
         const query = `
-            select * from bilbioteca.Emprestimo where id = ?
+            select * from biblioteca.Emprestimo where id = ?
         `
         const resultado = await executarComandoSQL(query, [id]);
         if (resultado[0] != undefined) {
@@ -81,7 +81,7 @@ export class EmprestimoRepository {
 
     async buscarEmprestimosAtivos() {
         const query = `
-            select * from bilbioteca.emprestimo 
+            select * from biblioteca.emprestimo 
             where 
                 data_entrega is null and 
                 CURDATE() > data_devolucao
@@ -127,7 +127,7 @@ export class EmprestimoRepository {
     }
 
     async emprestarEstoque(estoque_id: number) {
-        const resultado = await executarComandoSQL(`select * from bilbioteca.Estoque where id = ?`, [estoque_id]);
+        const resultado = await executarComandoSQL(`select * from biblioteca.Estoque where id = ?`, [estoque_id]);
         let quantidade_emprestada;
         if (resultado[0].quantidade_emprestada != undefined) {
             quantidade_emprestada = resultado[0].quantidade_emprestada + 1;
@@ -135,7 +135,7 @@ export class EmprestimoRepository {
             quantidade_emprestada = 1;
         }
         if (resultado[0].quantidade < resultado[0].quantidade_emprestada) {
-            await executarComandoSQL(`update bilbioteca.Estoque set quantidade_emprestada  = ? where id = ?`, [quantidade_emprestada, estoque_id])
+            await executarComandoSQL(`update biblioteca.Estoque set quantidade_emprestada  = ? where id = ?`, [quantidade_emprestada, estoque_id])
             if (resultado[0].quantidade === resultado[0].quantidade_emprestada + 1) {
                 await executarComandoSQL(`update biblioteca.Estoque set disponivel = false where id = ?`, [estoque_id])
             }
@@ -144,11 +144,11 @@ export class EmprestimoRepository {
 
     async devolverEstoque(estoque_id: number) {
         const query = `
-            select * from bilbioteca.Estoque where id = ?
+            select * from biblioteca.Estoque where id = ?
         `;
         const resultado = await executarComandoSQL(query, [estoque_id]);
         const quantidade = resultado[0].quantidade_emprestada - 1;
-        executarComandoSQL(`update bilbioteca.estoque set quantidade_emprestada = ? where id = ?`, [quantidade, estoque_id]);
+        executarComandoSQL(`update biblioteca.estoque set quantidade_emprestada = ? where id = ?`, [quantidade, estoque_id]);
     }
 
     /*buscarEstoqueEmprestimoAtivo(estoque_id: number) {
@@ -162,7 +162,7 @@ export class EmprestimoRepository {
 
     async registrarDevolucao(entrega: Date, atraso: number, suspensao: Date, id: number) {
         const query = `
-                    update bilbioteca.Emprestimo
+                    update biblioteca.Emprestimo
                         set data_entrega = ?,
                         set dias_atraso = ?,
                         set suspensao_ate = ?,

@@ -1,4 +1,4 @@
-/*import express from "express";
+import express from "express";
 import { RegisterRoutes } from './route/routes';
 import { setupSwagger } from "./config/swagger";
 
@@ -9,8 +9,8 @@ app.use(express.json());
 const apiRouter = express.Router();
 RegisterRoutes(apiRouter);
 
-app.use('/library', apiRouter);
+app.use('/api', apiRouter);
 RegisterRoutes(app);
 setupSwagger(app);
 
-app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));*/
+app.listen(PORT, () => console.log(`API em execução no URL: http://localhost:${PORT}`));

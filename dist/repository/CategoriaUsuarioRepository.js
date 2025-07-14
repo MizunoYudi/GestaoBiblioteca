@@ -1,40 +1,51 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoriaUsuarioRepository = void 0;
+const mysql_1 = require("../database/mysql");
 class CategoriaUsuarioRepository {
     static instance;
-    categoriaUsuarioList = [
-        {
-            id: 1,
-            nome: "Professor"
-        },
-        {
-            id: 2,
-            nome: "Aluno"
-        },
-        {
-            id: 3,
-            nome: "Bibliotecário"
-        }
-    ];
-    constructor() { }
+    constructor() {
+        this.criarTabela();
+    }
     ;
+    async criarTabela() {
+        const query = `
+            CREATE TABLE IF NOT EXISTS biblioteca.Categoria_Usuario (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(80) NOT NULL
+            );
+        `;
+        try {
+            const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+            console.log('Tabela Categoria Usuario criada: ', resultado);
+        }
+        catch (err) {
+            console.log("Erro ao criar a tabela Categoria Usuario: ", err);
+        }
+    }
     static getInstance() {
         if (!this.instance) {
             this.instance = new CategoriaUsuarioRepository();
         }
         return this.instance;
     }
-    buscarCategorias() {
-        return this.categoriaUsuarioList;
+    async buscarCategorias() {
+        const query = `
+            select * from biblioteca.Categoria_Usuario;
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, []);
+        return resultado;
     }
-    verificarCategoria(id) {
-        const indice = this.categoriaUsuarioList.findIndex(c => c.id == id);
-        if (indice == -1) {
-            return false;
+    async verificarCategoria(id) {
+        const query = `
+            select * from biblioteca.Categoria_Usuario where id = ?;
+        `;
+        const resultado = await (0, mysql_1.executarComandoSQL)(query, [id]);
+        if (resultado[0] != undefined) {
+            return true;
         }
         else {
-            return true;
+            return false;
         }
     }
 }

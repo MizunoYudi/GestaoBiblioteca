@@ -1,110 +1,95 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmprestimoService = void 0;
-const Emprestimo_1 = require("../model/Emprestimo");
+const EmprestimoEntity_1 = require("../model/entity/EmprestimoEntity");
 const EmprestimoRepository_1 = require("../repository/EmprestimoRepository");
-const UsuarioRepository_1 = require("../repository/UsuarioRepository");
 const EstoqueService_1 = require("./EstoqueService");
 const LivroService_1 = require("./LivroService");
 class EmprestimoService {
     emprestimoRepository = EmprestimoRepository_1.EmprestimoRepository.getInstance();
-    usuarioRepository = UsuarioRepository_1.UsuarioRepository.getInstance();
     livroService = new LivroService_1.LivroService();
     estoqueService = new EstoqueService_1.EstoqueService();
-    cadastrarEmprestimo(empData) {
+    async cadastrarEmprestimo(empData) {
         const { usuario_id, estoque_id } = empData;
         if (!usuario_id || !estoque_id) {
             throw new Error("Informações incompletas para o cadastro do emprestimo");
         }
-        const devolucao = this.calcularDevolucao(usuario_id, estoque_id, new Date());
-        const novoEmprestimo = new Emprestimo_1.Emprestimo(parseInt(usuario_id), parseInt(estoque_id), new Date(), devolucao);
+        const devolucao = await this.calcularDevolucao(usuario_id, estoque_id, new Date());
+        const novoEmprestimo = new EmprestimoEntity_1.EmprestimoEntity(parseInt(usuario_id), parseInt(estoque_id), new Date(), devolucao);
         if (this.validarEmprestimo(usuario_id, estoque_id)) {
-            this.emprestarEstoque(estoque_id);
-            this.emprestimoRepository.inserirEmprestimo(novoEmprestimo);
-            return novoEmprestimo;
+            this.emprestimoRepository.emprestarEstoque(estoque_id);
+            return await this.emprestimoRepository.inserirEmprestimo(novoEmprestimo);
         }
     }
-    listarEmprestimos() {
-        const emprestimos = this.emprestimoRepository.buscarEmprestimos();
+    async listarEmprestimos() {
+        const emprestimos = await this.emprestimoRepository.buscarEmprestimos();
         return emprestimos;
     }
-    obterEmprestimosUsuario(usuario_id) {
-        const emprestimos = this.emprestimoRepository.buscarEmprestimos();
+    async obterEmprestimosUsuario(usuario_id) {
+        const emprestimos = await this.emprestimoRepository.buscarEmprestimos();
         const emp_usuario = emprestimos.filter(e => e.usuario_id = usuario_id);
         return emp_usuario;
     }
-    existeEstoqueAtivo(id_estoque) {
-        return this.emprestimoRepository.buscarEstoqueEmprestimoAtivo(id_estoque);
-    }
-    atualizarEmprestimo(id) {
-        const emp = this.emprestimoRepository.buscarEmprestimoId(id);
+    async atualizarEmprestimo(id) {
+        const emp = await this.emprestimoRepository.buscarEmprestimoId(id);
         const data_entrega = new Date();
-        const atraso = this.calcularAtraso(emp);
-        this.devolverEstoque(emp.estoque_id);
-        this.emprestimoRepository.registrarDevolucao(data_entrega, atraso.dias, atraso.data, id);
+        const atraso = await this.calcularAtraso(emp);
+        this.emprestimoRepository.devolverEstoque(emp.estoque_id);
+        return this.emprestimoRepository.registrarDevolucao(data_entrega, atraso.dias, atraso.data, id);
     }
     atualizarStatusUsuarios() {
-        setInterval(() => {
-            const emprestimos = this.emprestimoRepository.buscarEmprestimos().filter(e => new Date() > e.data_devolucao);
+        setInterval(async () => {
+            const emprestimos = await this.emprestimoRepository.buscarEmprestimosAtivos();
             for (const e of emprestimos) {
-                const usuario = this.usuarioRepository.buscarUsuarioId(e.usuario_id);
-                const data_suspensao = this.calcularAtraso(e);
-                e.dias_atraso = data_suspensao.dias;
-                e.suspensao_ate = data_suspensao.data;
-                if (data_suspensao.dias_suspensao > 60) {
-                    usuario.ativo = "inativo";
-                }
-                else {
-                    usuario.ativo = "suspenso";
-                }
+                this.aplicarMultaUsuario(e);
+                this.aplicarMultaEmprestimo(e);
             }
         }, 360000);
     }
-    emprestarEstoque(estoque_id) {
-        const estoque = this.estoqueService.filtrarPorId(estoque_id);
-        if (estoque.quantidade_emprestada != estoque.quantidade) {
-            estoque.quantidade_emprestada += 1;
-            if (estoque.quantidade_emprestada == estoque.quantidade) {
-                estoque.disponivel = false;
-            }
+    async aplicarMultaUsuario(emprestimo) {
+        const data_suspensao = await this.calcularAtraso(emprestimo);
+        if (data_suspensao.dias_suspensao > 60) {
+            this.emprestimoRepository.atualizarUsuarioMulta("inativo", emprestimo.usuario_id);
+        }
+        else {
+            this.emprestimoRepository.atualizarUsuarioMulta("suspenso", emprestimo.usuario_id);
         }
     }
-    devolverEstoque(estoque_id) {
-        const estoque = this.estoqueService.filtrarPorId(estoque_id);
-        estoque.quantidade_emprestada -= 1;
+    async aplicarMultaEmprestimo(emprestimo) {
+        const data_suspensao = await this.calcularAtraso(emprestimo);
+        this.emprestimoRepository.atualizarEmprestimoMulta(data_suspensao.dias, data_suspensao.data);
     }
-    verificarEstoque(estoque_id) {
-        const estoque = this.estoqueService.filtrarPorId(estoque_id);
+    async verificarEstoque(estoque_id) {
+        const estoque = await this.estoqueService.filtrarPorId(estoque_id);
         if (!estoque.disponivel) {
             throw new Error(`Não há exemplares disponíveis para emprestimo. Quantidade total: ${estoque.quantidade}, Quantidade emprestada:${estoque.quantidade_emprestada}`);
         }
     }
-    verificarLivroEmprestimo(livro_id) {
-        const estoque = this.estoqueService.listarExemplares().findIndex(e => e.livro_id = livro_id);
-        if (estoque != -1) {
+    /*async verificarLivroEmprestimo(livro_id: number){
+        const estoque = this.estoqueService.listarExemplares().findIndex(e => e.livro_id = livro_id)
+        if(estoque != -1){
             return true;
-        }
-        else {
+        } else {
             return false;
         }
-    }
-    verificarUsuarioAtivo(usuario_id) {
-        const usuario = this.usuarioRepository.buscarUsuarioId(usuario_id);
-        if (usuario.ativo != 'ativo') {
-            throw new Error(`O usuário não está permitido a realizar empréstimos. Status: ${usuario.ativo}`);
+    }*/
+    async verificarUsuarioAtivo(usuario_id) {
+        const usuario = await this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id);
+        if (usuario.status != 'ativo') {
+            throw new Error(`O usuário não está permitido a realizar empréstimos. Status: ${usuario.status}`);
         }
     }
-    verificarLimiteLivros(usuario_id, estoque_id) {
-        const usuario = this.usuarioRepository.buscarUsuarioId(usuario_id);
-        const emp_usuario = this.emprestimoRepository.buscarEmprestimos().filter(e => e.usuario_id == usuario.id);
-        const permissoes = this.permissoesEmprestimo(usuario_id, estoque_id);
+    async verificarLimiteLivros(usuario_id, estoque_id) {
+        const usuario = await this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id);
+        const emp_usuario = (await this.emprestimoRepository.buscarEmprestimos()).filter(e => e.usuario_id == usuario.id);
+        const permissoes = await this.permissoesEmprestimo(usuario_id, estoque_id);
         const emp_ativo = emp_usuario.filter(e => e.data_entrega == undefined);
         if (emp_ativo.length + 1 > permissoes.livros) {
             throw new Error(`Usuário está no limite de livros emprestados. Quantidade permitida: ${permissoes.livros}. Quantidade emprestada: ${emp_usuario.length}`);
         }
     }
-    verificarLivrosSuspensos(usuario_id) {
-        const emp_usuario = this.obterEmprestimosUsuario(usuario_id);
+    async verificarLivrosSuspensos(usuario_id) {
+        const emp_usuario = await this.obterEmprestimosUsuario(usuario_id);
         const dias_atraso = emp_usuario.map(e => e.dias_atraso);
         const maior_atraso = Math.max(...dias_atraso);
         const data_suspensao = new Date();
@@ -120,17 +105,17 @@ class EmprestimoService {
         this.verificarLivrosSuspensos(usuario_id);
         return true;
     }
-    calcularDevolucao(usuario_id, estoque_id, data_emprestimo) {
+    async calcularDevolucao(usuario_id, estoque_id, data_emprestimo) {
         const data_devolucao = new Date(data_emprestimo);
-        const permissoes = this.permissoesEmprestimo(usuario_id, estoque_id);
+        const permissoes = await this.permissoesEmprestimo(usuario_id, estoque_id);
         data_devolucao.setDate(data_emprestimo.getDate() + permissoes.dias);
         return data_devolucao;
     }
-    calcularAtraso(emp) {
+    async calcularAtraso(emp) {
         const atraso = { dias: 0, data: new Date(), dias_suspensao: 0 };
         const data = new Date(emp.data_emprestimo);
-        const permissoes = this.permissoesEmprestimo(emp.usuario_id, emp.estoque_id);
-        atraso.dias_suspensao = this.diasAtrasoPorCategoria(emp);
+        const permissoes = await this.permissoesEmprestimo(emp.usuario_id, emp.estoque_id);
+        atraso.dias_suspensao = await this.diasAtrasoPorCategoria(emp);
         atraso.dias = Math.floor((atraso.data.getTime() - data.getTime()) / (1000 * 60 * 60 * 24));
         if (atraso.dias <= permissoes.dias) {
             atraso.dias = 0;
@@ -138,8 +123,8 @@ class EmprestimoService {
         atraso.data.setDate(atraso.data.getDate() + atraso.dias_suspensao);
         return atraso;
     }
-    diasAtrasoPorCategoria(emp) {
-        const permissoes = this.permissoesEmprestimo(emp.usuario_id, emp.estoque_id);
+    async diasAtrasoPorCategoria(emp) {
+        const permissoes = await this.permissoesEmprestimo(emp.usuario_id, emp.estoque_id);
         const data_atual = new Date();
         const data_emp = new Date(emp.data_emprestimo);
         const dias_atraso = Math.floor((data_atual.getTime() - data_emp.getTime()) / (1000 * 60 * 60 * 24));
@@ -148,10 +133,10 @@ class EmprestimoService {
         }
         return 0;
     }
-    permissoesEmprestimo(usuario_id, estoque_id) {
-        const usuario = this.usuarioRepository.buscarUsuarioId(usuario_id);
-        const estoque = this.estoqueService.filtrarPorId(estoque_id);
-        const livro = this.livroService.filtrarPorId(estoque.livro_id);
+    async permissoesEmprestimo(usuario_id, estoque_id) {
+        const usuario = await this.emprestimoRepository.buscarUsuarioEmprestimo(usuario_id);
+        const estoque = await this.emprestimoRepository.buscarEstoqueEmprestimo(estoque_id);
+        const livro = await this.emprestimoRepository.buscarLivroEmprestimo(estoque.livro_id);
         const disponibilidade_emp = { dias: 0, livros: 0 };
         switch (usuario.categoria_id) {
             case 1:

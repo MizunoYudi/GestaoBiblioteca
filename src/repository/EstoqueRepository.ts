@@ -1,10 +1,8 @@
 import { executarComandoSQL } from "../database/mysql";
 import { EstoqueEntity } from "../model/entity/EstoqueEntity";
-import { EmprestimoRepository } from "./EmprestimoRepository";
 
 export class EstoqueRepository {
     private static instance: EstoqueRepository;
-    private emprestimoRepository = EmprestimoRepository.getInstance();
 
     private constructor() { }
 
@@ -23,7 +21,7 @@ export class EstoqueRepository {
                     quantidade int NOT NULL,
                     quantidade_emprestada int,
                     disponivel boolean NOT NULL,
-                    foreign key(livro_id) references bilbioteca.livro(id),
+                    foreign key(livro_id) references biblioteca.livro(id),
                     unique(livro_id)
                 );
             `;
@@ -37,7 +35,7 @@ export class EstoqueRepository {
 
     async inserirExemplar(exemplar: EstoqueEntity) {
         const query = `
-            insert into bilbioteca.Estoque(livro_id, quantidade, disponivel)
+            insert into biblioteca.Estoque(livro_id, quantidade, disponivel)
                 values(?, ?, ?);
         `;
         const resultado = await executarComandoSQL(query, [exemplar.livro_id, exemplar.quantidade, exemplar.disponivel]);
@@ -97,7 +95,7 @@ export class EstoqueRepository {
 
     async excluirExemplar(id: number) {
         const query = `
-            delete from bilbioteca.Estoque where id = ?;
+            delete from biblioteca.Estoque where id = ?;
         `;
         const resultado = await executarComandoSQL(query, [id]);
         console.log("Estoque excluido com sucesso: ", resultado);
@@ -105,7 +103,7 @@ export class EstoqueRepository {
 
     async existeEmprestimosAtivos(estoque_id: number){
         const query = `
-            select * from bilbioteca.Emprestimo where estoque_id = ? and data_entrega is null
+            select * from biblioteca.Emprestimo where estoque_id = ? and data_entrega is null
         `;
         const resultado = await executarComandoSQL(query, [estoque_id]);
         if(resultado[0] != undefined){

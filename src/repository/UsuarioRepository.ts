@@ -1,10 +1,8 @@
 import { executarComandoSQL } from "../database/mysql";
 import { UsuarioEntity } from "../model/entity/UsuarioEntity";
-import { EmprestimoRepository } from "./EmprestimoRepository";
 
 export class UsuarioRepository {
     private static instance: UsuarioRepository;
-    private emprestimoRepository = EmprestimoRepository.getInstance();
 
     public static getInstance(): UsuarioRepository {
         if (!this.instance) {
@@ -42,7 +40,7 @@ export class UsuarioRepository {
 
     async inserirUsuario(usuario: UsuarioEntity) {
         const query = `
-            insert into bilbioteca.Usuario(titulo, autor, edicao, editora, isbn, categoria_id)
+            insert into biblioteca.Usuario(titulo, autor, edicao, editora, isbn, categoria_id)
                 values(?, ?, ?, ?, ?, ?);
         `;
         const resultado = await executarComandoSQL(query, [usuario.nome, usuario.cpf, usuario.status, usuario.categoria_id, usuario.curso_id]);
@@ -83,7 +81,7 @@ export class UsuarioRepository {
 
     async alterarUsuario(nome: string, status: string, categoria_id: number, curso_id: number, cpf: string): Promise<UsuarioEntity> {
         const query = `
-                    update bilbioteca.Usuario
+                    update biblioteca.Usuario
                         set nome = ?,
                         set status = ?,
                         set categoria_id = ?,
@@ -106,7 +104,7 @@ export class UsuarioRepository {
 
     async existeEmprestimosAtivos(usuario_id: number) {
         const query = `
-            select * from bilbioteca.Emprestimo where usuario_id = ? and data_entrega is null
+            select * from biblioteca.Emprestimo where usuario_id = ? and data_entrega is null
         `;
         const resultado = await executarComandoSQL(query, [usuario_id]);
         if(resultado[0] != undefined){
